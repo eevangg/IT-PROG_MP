@@ -17,6 +17,7 @@
                 </div>
                 
                 <ul>
+                    <li><a href="login.php">Login</a></li>
                     <li><a href="create.php">Create Order</a></li>
                     <li><a href="read.php">View Orders</a></li>
                     <li><a href="update.php">Edit Order</a></li>
