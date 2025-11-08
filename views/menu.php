@@ -1,6 +1,6 @@
 <?php include('header.php'); ?>
 
-<section id="menu" class="container">
+<section id="menu" class="container"> 
   <h2>Today's Menu</h2>
   <div class="menu-grid">
     <?php
