@@ -1,6 +1,6 @@
 <?php include('header.php'); ?>
 
-<section id="history" class="container">
+<section id="history" class="container my-5 fullHeight">
   <h2>Order History</h2>
   <table class="history-table">
     <tr>

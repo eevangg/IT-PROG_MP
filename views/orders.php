@@ -1,6 +1,6 @@
 <?php include('header.php'); ?>
 
-<section id="orders" class="container">
+<section id="orders" class="container my-5 fullHeight">
   <h2>My Orders</h2>
   <?php
   // Sample orders (later from database)
