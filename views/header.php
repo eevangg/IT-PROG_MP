@@ -29,11 +29,26 @@
 
         <div class="collapse navbar-collapse" id="navbarNavDropdown"></div>
           <!-- nav links -->
-          <ul class="navbar-nav">
-            <li><a href="menu.php" class="nav-link text-white text-decoration-none mx-2">Menu</a></li>
-            <li><a href="orders.php" class="nav-link text-white text-decoration-none mx-2">My Orders</a></li>
-            <li><a href="history.php" class="nav-link text-white text-decoration-none mx-2">History</a></li>
-            <li><a href="index.php" class="nav-link text-white text-decoration-none mx-2">Profile</a></li>
-          </ul>
+          <div class="navbar-nav">
+            <a href="menu.php" class="nav-link text-white text-decoration-none mx-2">Menu</a>
+            <a href="orders.php" class="nav-link text-white text-decoration-none mx-2">My Orders</a>
+            <a href="history.php" class="nav-link text-white text-decoration-none mx-2">History</a>
+            <a href="index.php" class="nav-link text-white text-decoration-none mx-2">Profile</a>
+          </div>
+
+          <!-- Profile dropdown -->
+          <div class="dropdown ms-3">
+            <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person-circle fs-5 me-1"></i>
+              <span>Account</span>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#">Sign In</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Sign Up</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </nav>
