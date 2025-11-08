@@ -19,7 +19,7 @@
     <nav class="navbar navbar-expand-lg bg-success sticky-top">
       <div class="container-fluid">
         <div class="logo">
-          <p class="navbar-brand" href="/">🍽️ ArcherInnov Canteen</p>
+          <p class="navbar-brand text-white" href="/">ArcherInnov Canteen</p>
         </div>
 
         <!-- Nav Bar toggler -->
