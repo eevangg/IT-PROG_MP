@@ -33,6 +33,14 @@ AUTO_INCREMENT = 4
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci;
 
+-- -----------------------------------------------------
+-- Sample Data for `menu_items`
+-- -----------------------------------------------------
+INSERT INTO `menu_items` (`item_name`, `category`, `price`, `description`, `status`) VALUES
+('Pancake Meal', 'Breakfast', 50.00, 'Fluffy pancakes with syrup', 'active'),
+('Chicken Adobo', 'Lunch', 85.00, 'Classic Filipino dish with rice', 'active'),
+('Tuna Sandwich', 'Snack', 40.00, 'Freshly made tuna sandwich', 'active');
+
 
 -- -----------------------------------------------------
 -- Table `canteen_preorder_db`.`inventory_logs`
@@ -53,6 +61,14 @@ CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`inventory_logs` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci;
+
+-- -----------------------------------------------------
+-- Sample Data for `inventory_logs`
+-- -----------------------------------------------------
+INSERT INTO `inventory_logs` (`item_id`, `change_type`, `quantity_changed`, `log_date`) VALUES
+(1, 'restock', 30, NOW()),
+(2, 'restock', 25, NOW()),
+(3, 'order', -5, NOW());
 
 
 -- -----------------------------------------------------
@@ -77,6 +93,14 @@ AUTO_INCREMENT = 4
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci;
 
+-- -----------------------------------------------------
+-- Sample Data for `meal_plans`
+-- -----------------------------------------------------
+INSERT INTO `meal_plans` (`item_id`, `day_of_week`, `week_start`, `available_qty`, `status`) VALUES
+(1, 'Monday', '2025-10-20', 20, 'available'),
+(2, 'Tuesday', '2025-10-20', 15, 'available'),
+(3, 'Wednesday', '2025-10-20', 10, 'available');
+
 
 -- -----------------------------------------------------
 -- Table `canteen_preorder_db`.`users`
@@ -97,6 +121,14 @@ CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`users` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci;
+
+-- -----------------------------------------------------
+-- Sample Data for `users`
+-- -----------------------------------------------------
+INSERT INTO `users` (`username`, `password`, `full_name`, `email`, `user_type`, `balance`, `status`) VALUES
+('jason123', 'password123', 'Jason Dela Cruz', 'jason@example.com', 'student', 500.00, 'active'),
+('anna_smith', 'pass456', 'Anna Smith', 'anna@example.com', 'staff', 800.00, 'active'),
+('admin', 'adminpass', 'System Admin', 'admin@example.com', 'admin', 0.00, 'active');
 
 
 -- -----------------------------------------------------
@@ -128,6 +160,14 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci;
 
+-- -----------------------------------------------------
+-- Sample Data for `orders`
+-- -----------------------------------------------------
+INSERT INTO `orders` (`user_id`, `plan_id`, `total_amount`, `payment_method`, `pickup_time`, `status`) VALUES
+(1, 1, 50.00, 'wallet', '08:30:00', 'completed'),
+(2, 2, 85.00, 'cash', '12:15:00', 'confirmed'),
+(1, 3, 40.00, 'qr', '15:00:00', 'pending');
+
 
 -- -----------------------------------------------------
 -- Table `canteen_preorder_db`.`order_details`
@@ -157,6 +197,15 @@ COLLATE = utf8mb4_general_ci;
 
 
 -- -----------------------------------------------------
+-- Sample Data for `order_details`
+-- -----------------------------------------------------
+INSERT INTO `order_details` (`order_id`, `item_id`, `quantity`, `subtotal`) VALUES
+(1, 1, 1, 50.00),
+(2, 2, 1, 85.00),
+(3, 3, 1, 40.00);
+
+
+-- -----------------------------------------------------
 -- Table `canteen_preorder_db`.`payments`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`payments` (
@@ -176,6 +225,15 @@ CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`payments` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci;
+
+
+-- -----------------------------------------------------
+-- Sample Data for `payments`
+-- -----------------------------------------------------
+INSERT INTO `payments` (`order_id`, `payment_method`, `amount_paid`, `payment_status`) VALUES
+(1, 'wallet', 50.00, 'paid'),
+(2, 'cash', 85.00, 'paid'),
+(3, 'qr', 40.00, 'pending');
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
