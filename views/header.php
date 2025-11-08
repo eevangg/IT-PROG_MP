@@ -31,7 +31,7 @@
           <!-- nav links -->
           <div class="navbar-nav">
             <a href="menu.php" class="nav-link text-white text-decoration-none mx-2">Menu</a>
-            <a href="orders.php" class="nav-link text-white text-decoration-none mx-2">My Orders</a>
+            <a href="orders.php" class="nav-link text-white text-decoration-none mx-2">Cart</a>
             <a href="history.php" class="nav-link text-white text-decoration-none mx-2">History</a>
             <a href="index.php" class="nav-link text-white text-decoration-none mx-2">Profile</a>
           </div>
