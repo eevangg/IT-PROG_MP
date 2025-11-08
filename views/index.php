@@ -1,6 +1,6 @@
 <?php include('header.php'); ?>
 
-<section class="container auth-section">
+<section class="container my-5 fullHeight auth-section">
   <h2>Welcome to the School Canteen Pre-order System</h2>
 
   <div class="auth-tabs">
