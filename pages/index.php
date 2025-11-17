@@ -1,4 +1,4 @@
-<?php include('header.php'); ?>
+<?php include('../includes/header.php'); ?>
 
 <section class="container my-5 fullHeight auth-section">
   <h2>Welcome to the School Canteen Pre-order System</h2>
@@ -34,4 +34,4 @@ function showTab(tab) {
 }
 </script>
 
-<?php include('footer.php'); ?>
+<?php include('../includes/footer.php'); ?>

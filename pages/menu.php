@@ -1,4 +1,4 @@
-<?php include('header.php'); ?>
+<?php include('../includes/header.php'); ?>
 
 <section id="menu" class="container my-5 fullHeight"> 
   <h2>Today's Menu</h2>
@@ -23,4 +23,4 @@
   </div>
 </section>
 
-<?php include('footer.php'); ?>
+<?php include('../includes/footer.php'); ?>

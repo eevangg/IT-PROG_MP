@@ -1,4 +1,4 @@
-<?php include('header.php'); ?> 
+<?php include('../includes/header.php'); ?>
 
 <section id="history" class="container my-5 fullHeight">
   <h2>Order History</h2>
@@ -15,4 +15,4 @@
   </table>
 </section>
 
-<?php include('footer.php'); ?>
+<?php include('../includes/footer.php'); ?>

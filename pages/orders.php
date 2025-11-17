@@ -1,4 +1,4 @@
-<?php include('header.php'); ?>
+<?php include('../includes/header.php'); ?>
 
 <section id="orders" class="container my-5 fullHeight">
   <h2>My Orders</h2>
@@ -21,4 +21,4 @@
   <?php endforeach; ?>
 </section>
 
-<?php include('footer.php'); ?>
+<?php include('../includes/footer.php'); ?>
