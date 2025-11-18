@@ -24,7 +24,8 @@
             echo json_encode(['error' => 'Username or Email already exists!']);
             exit;
         }
-    
+        $stmt1->close();
+        
         // Hash the password before storing
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
@@ -34,11 +35,17 @@
 
         if ($stmt2->execute()) {
             echo json_encode(['success' => 'Registration successful!']);
+            $stmt2->close();
+            $conn->close();
             exit;
         } else {
             echo json_encode(['error' => 'Registration failed.']);
+            $stmt2->close();
+            $conn->close();
             exit;
         }
+
+       
     }
 
 ?>

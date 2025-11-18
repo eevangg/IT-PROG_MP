@@ -21,10 +21,15 @@
                 // store session data
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['username'] = $user['username'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['name'] = $user['full_name'];
                 $_SESSION['role'] = $user['user_type'];
+                $_SESSION['balance'] = $user['balance'];
+                $_SESSION['member'] = $user['date_created'];
         
                 // redirect based on role
                 if ($user['user_type'] == 'admin') {
+                    $_SESSION['is_admin'] = 'admin';
                     echo json_encode(['success' => "Login successful!", 'role' => 'admin']);
                     //header("Location: pages/admin_dashboard.php");
                 } elseif ($user['user_type'] == 'staff') {
@@ -34,18 +39,23 @@
                     echo json_encode(['success' => "Login successful!", 'role' => 'student']);
                     //header("Location: pages/student_dashboard.php");
                 }
+                $stmt->close();
+                $conn->close();
                 exit;
         
             } else {
                 echo json_encode(['error' => "Incorrect password!"]);
                 header("Location: login.php");
+                $stmt->close();
+                $conn->close();
                 exit;
             }
         } else {
             $_SESSION['error'] = "Email not found!";
             header("Location: login.php");
+            $stmt->close();
+            $conn->close();
             exit;
         }
-
     }
 ?>

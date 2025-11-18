@@ -1,5 +1,12 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
+
+if (!isset($_SESSION['username'])) {
+  header("Location: ../pages/login.php");
+  exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -10,20 +17,32 @@ session_start();
     <title>School Canteen Pre-order System</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"> <!-- Bootsrap icons -->
+    <link href="../assets/css/main.css" rel="stylesheet" /> <!-- Custom CSS -->
 
     <!-- JS -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="../assets/js/menu.js"></script> <!-- Custom JS -->
+
+    <style>
+      .dropdown-menu li a:hover {
+        background-color: #198754;
+        color: white;
+      }
+      .dropdown-menu li a:active {
+        background-color: #145c32;
+        color: white;
+      }
+    </style>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg bg-success sticky-top">
       <div class="container-fluid">
         <div class="logo">
-          <p class="navbar-brand text-white" href="/">ArcherInnov Canteen</p>
+          <p class="navbar-brand" href="/">ArcherInnov Canteen</p>
         </div>
 
         <!-- Nav Bar toggler -->
@@ -37,7 +56,6 @@ session_start();
             <a href="menu.php" class="nav-link text-white text-decoration-none mx-2">Menu</a>
             <a href="orders.php" class="nav-link text-white text-decoration-none mx-2">Cart</a>
             <a href="history.php" class="nav-link text-white text-decoration-none mx-2">History</a>
-            <a href="index.php" class="nav-link text-white text-decoration-none mx-2">Profile</a>
           </div>
 
           <!-- Profile dropdown -->
@@ -52,8 +70,11 @@ session_start();
             <ul class="dropdown-menu dropdown-menu-end">
               <?php if (isset($_SESSION['username'])): ?>
                 <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="../processes/logout.php">Logout</a></li>
+                <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="admin_dashboard.php">Admin Dashboard</a></li>
+                <?php endif; ?>
               <?php else: ?>
                 <li><a class="dropdown-item" href="login.php">Sign In</a></li>
                 <li><hr class="dropdown-divider"></li>
