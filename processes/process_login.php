@@ -1,0 +1,45 @@
+<?php
+    session_start();
+    include "../config/db.php";
+    
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    
+    // Secure hashed password check
+    $sql = "SELECT * FROM users WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+    
+        if (password_verify($password, $user['password'])) {
+    
+            // store session data
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['user_type'];
+    
+            // redirect based on role
+            if ($user['user_type'] == 'admin') {
+                header("Location: pages/admin_dashboard.php");
+            } elseif ($user['user_type'] == 'staff') {
+                header("Location: pages/staff_dashboard.php");
+            } else {
+                header("Location: pages/student_dashboard.php");
+            }
+            exit;
+    
+        } else {
+            $_SESSION['error'] = "Incorrect password!";
+            header("Location: login.php");
+            exit;
+        }
+    } else {
+        $_SESSION['error'] = "Email not found!";
+        header("Location: login.php");
+        exit;
+    }
+?>
