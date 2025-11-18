@@ -1,11 +1,9 @@
 <?php include ('../includes/initial.php'); ?>
+
 <main class="container my-5 fullHeight">
-    <?php if(isset($_SESSION['error'])): ?>
-        <p class="error"><?= $_SESSION['error']; unset($_SESSION['error']); ?></p>
-    <?php endif; ?>
 
     <div class="card">
-        <form class="needs-validation" id="registerForm" name="registerForm" action="../processes/process_register.php" method="POST" novalidate>
+        <form class="needs-validation" id="registerForm" name="registerForm" method="POST" novalidate>
             <header>
                 <h2 class="text-center mb-4">Create a New Account</h2>
             </header>
@@ -35,7 +33,7 @@
                 <div class="invalid-feedback">Please input a valid password</div>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3 confirm_password">
                 <label for="confirm_password" class="form-label">Confirm Password:</label>
                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$">
                 <div class="invalid-feedback">Please confirm your password</div>
@@ -63,7 +61,8 @@
                 <p>Already have an account? <a href="login.php">Login here.</a></p>
             </div>
 
-            <div><p id="registerError" class="error-message text-danger mt-2"></p></div>
+            <div><p id="registerError" class="error-message text-danger text-center mt-2"></p></div>
+            <div id="message"></div>
         </form>
 </main>
 <?php include ('../includes/footer.php'); ?>

@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -40,13 +44,21 @@
           <div class="dropdown ms-3">
             <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
               <i class="bi bi-person-circle fs-5 me-1"></i>
-              <span>Account</span>
+              <span>
+                <?php echo isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Account'; ?>
+              </span>
             </button>
 
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#">Sign In</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Sign Up</a></li>
+              <?php if (isset($_SESSION['username'])): ?>
+                <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="../processes/logout.php">Logout</a></li>
+              <?php else: ?>
+                <li><a class="dropdown-item" href="login.php">Sign In</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="register.php">Sign Up</a></li>
+              <?php endif; ?>
             </ul>
           </div>
         </div>

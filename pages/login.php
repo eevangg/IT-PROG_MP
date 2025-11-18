@@ -1,14 +1,6 @@
-<?php
-session_start();
-?>
-
 <?php include "../includes/initial.php"; ?>
         
 <main class="container my-5 fullHeight">
-
-    <?php if(isset($_SESSION['error'])): ?>
-        <p class="error"><?= $_SESSION['error']; unset($_SESSION['error']); ?></p>
-    <?php endif; ?>
 
     <div class="card" id="login-auth">
         <form class="needs-validation" id="loginForm" name="loginForm" action="../processes/process_login.php" method="POST" novalidate>
@@ -36,7 +28,7 @@ session_start();
                 <p>Don't have an account? <a href="register.php">Register here.</a></p>
             </div>
 
-            <div><p id="loginError" class="error-message text-danger mt-2"></p></div>
+            <div><p id="loginFeedback" class="feedback-message text-danger mt-2"></p></div>
         </form>
     </div>
 </main>

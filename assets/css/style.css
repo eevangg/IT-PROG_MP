@@ -1,5 +1,5 @@
 .fullHeight {
-    min-height: 75vh
+    min-height: 75vh;
 }
 .card {
     margin: 100px 200px ;
@@ -9,9 +9,14 @@
     background-color: #ffffff;
 }
 
-#loginForm{
+#loginForm {
     margin: 50px 100px ;
 }
+
+#registerForm {
+    margin: 50px 50px ;
+}
+
 input{
     width: 100%;
     padding: 10px;

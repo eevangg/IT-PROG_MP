@@ -2,25 +2,43 @@
     session_start();
     include ("../config/db.php");
 
-    $username = $_POST['username'];
-    $fullname = $_POST['fullname'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-   
-    // Hash the password before storing
-    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $username = $_POST['username'];
+        $fullname = $_POST['fullname'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
-    $sql = "INSERT INTO users (username, password, full_name, email) VALUES (?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssss", $username, $hashed_password, $fullname, $email);
+        // Example validation
+        if (empty($username) || empty($fullname) || empty($email) || empty($password)) {
+            echo json_encode(['error' => 'All fields are required.']);
+            exit;
+        }
+      
+         // Check if username or email already exists
+        $sql = "SELECT * FROM users WHERE username = ? OR email = ?";
+        $stmt1 = $conn->prepare($sql);
+        $stmt1->bind_param("ss", $username, $email);
+        $stmt1->execute();
+        $result = $stmt1->get_result();
+        if ($result->num_rows > 0) {
+            echo json_encode(['error' => 'Username or Email already exists!']);
+            exit;
+        }
+    
+        // Hash the password before storing
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-    if ($stmt->execute()) {
-        $_SESSION['success'] = "Registration successful! Please log in.";
-        header("Location: login.php");
-        exit;
-    } else {
-        $_SESSION['error'] = "Registration failed! Please try again.";
-        header("Location: register.php");
-        exit;
+        $query = "INSERT INTO users (username, password, full_name, email) VALUES (?, ?, ?, ?)";
+        $stmt2 = $conn->prepare($query);
+        $stmt2->bind_param("ssss", $username, $hashed_password, $fullname, $email);
+
+        if ($stmt2->execute()) {
+            echo json_encode(['success' => 'Registration successful!']);
+            exit;
+        } else {
+            echo json_encode(['error' => 'Registration failed.']);
+            exit;
+        }
     }
+
 ?>
