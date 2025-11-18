@@ -3,8 +3,8 @@
     include "../config/db.php";
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $username = $_POST['username'];
-        $password = $_POST['password'];
+        $username = $_POST['loginUsername'];
+        $password = $_POST['loginPassword'];
 
         // Secure hashed password check
         $sql = "SELECT * FROM users WHERE username = ?";
@@ -25,11 +25,14 @@
         
                 // redirect based on role
                 if ($user['user_type'] == 'admin') {
-                    header("Location: pages/admin_dashboard.php");
+                    echo json_encode(['success' => "Login successful!", 'role' => 'admin']);
+                    //header("Location: pages/admin_dashboard.php");
                 } elseif ($user['user_type'] == 'staff') {
-                    header("Location: pages/staff_dashboard.php");
+                    echo json_encode(['success' => "Login successful!", 'role' => 'staff']);
+                    //header("Location: pages/staff_dashboard.php");
                 } else {
-                    header("Location: pages/student_dashboard.php");
+                    echo json_encode(['success' => "Login successful!", 'role' => 'student']);
+                    //header("Location: pages/student_dashboard.php");
                 }
                 exit;
         
