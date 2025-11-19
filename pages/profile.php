@@ -1,6 +1,6 @@
 <?php 
-    include('../includes/header.php'); 
-    
+$pageTitle = "Profile - ArcherInnov Canteen Pre-order System";
+include('../includes/header.php');    
 ?>
 
 <main class="container my-5 fullHeight">
@@ -12,7 +12,7 @@
     <!-- Welcome Section -->
     <div class="profile-overview text-center mb-4 w-100">
         <p class="fw-semibold fs-5">Welcome, <?= htmlspecialchars($_SESSION['name'])?>!</p>
-        <p class="text-muted">Here you can manage manage your profile.</p>
+        <p class="text-muted">Here you can view and manage your profile.</p>
     </div>
 
     <?php

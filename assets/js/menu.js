@@ -1,4 +1,4 @@
-(document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     // Filter functionality
     document.getElementById('menuFilter').addEventListener('keyup', function () {
         const query = this.value.toLowerCase();
@@ -10,4 +10,4 @@
     });
 
 
-}));
+});

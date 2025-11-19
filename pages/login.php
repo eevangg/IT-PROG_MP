@@ -1,4 +1,5 @@
 <?php 
+$pageTitle = "Login - ArcherInnov Canteen Pre-order System";
 include "../includes/initial.php"; 
 
 if (isset($_SESSION['user_id'])) {

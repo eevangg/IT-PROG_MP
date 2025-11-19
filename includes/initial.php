@@ -8,7 +8,7 @@ session_start();
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Auth - School Canteen Pre-order System</title>
+        <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Auth - School Canteen Pre-order System'; ?></title>
 
         <!-- CSS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />

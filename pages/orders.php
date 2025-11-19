@@ -1,4 +1,7 @@
-<?php include('../includes/header.php'); ?>
+<?php 
+$pageTitle = "My Orders - ArcherInnov Canteen Pre-order System";
+include('../includes/header.php'); 
+?>
 
 <section id="orders" class="container my-5 fullHeight">
   <h2>My Orders</h2>

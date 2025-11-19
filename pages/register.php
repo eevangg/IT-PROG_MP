@@ -1,4 +1,7 @@
-<?php include ('../includes/initial.php'); ?>
+<?php 
+$pageTitle = "Register - ArcherInnov Canteen Pre-order System";
+include ('../includes/initial.php'); 
+?>
 
 <main class="container my-5 fullHeight">
 
@@ -10,13 +13,13 @@
             <br>
             <div class="mb-3">
                 <label for="fullname" class="form-label">Full Name:</label>
-                <input type="text" class="form-control" id="fullname" name="fullname" required min-length="2">
+                <input type="text" class="form-control" id="fullname" name="fullname" required minlength="2">
                 <div class="invalid-feedback">Please input a valid name</div>
             </div>
 
             <div class="mb-3">
                 <label for="username" class="form-label">Username:</label>
-                <input type="text" class="form-control" id="username" name="username" required min-length="2">
+                <input type="text" class="form-control" id="username" name="username" required minlength="2">
                 <div class="invalid-feedback">Please input a valid username</div>
             </div>
 

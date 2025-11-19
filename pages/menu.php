@@ -1,4 +1,7 @@
-<?php include('../includes/header.php'); ?>
+<?php 
+$pageTitle = "Menu - ArcherInnov Canteen Pre-order System";
+include('../includes/header.php'); 
+?>
 
 <section id="menu" class="container my-5 fullHeight"> 
 
@@ -7,7 +10,7 @@
         <span class="input-group-text bg-success text-white border-success">
           <i class="bi bi-search"></i>
         </span>
-        <input type="text" id="menuFilter" class="form-control" placeholder="Search by Meal, Price, Category...">
+        <input type="text" id="menuFilter" class="form-control" placeholder="Search by Meal, Price, Category, Description...">
       </div>
   </div>
 
@@ -35,7 +38,8 @@
                 <p class="card-subtitle mb-2 text-body-secondary"><?= $item['category']?></p>
                 <h3 class="card-text mb-1">₱ <?= $item['price']?></h3>
                 <p class="card-text mb-0"><?= $item['description']?></p>
-                <p class="card-text">Available Stock: <?= $item['stock']?></p>
+                <br>
+                <p class="card-text"><strong>Available Stock:</strong> <?= $item['stock']?></p>
                 <div class="mt-auto">
                     <a href="order.php?id=<?= $item['id'] ?>" class="btn btn-success d-grid gap-2">Order</a>
                 </div>
