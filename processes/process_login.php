@@ -15,6 +15,14 @@
         
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
+
+            // check if user status is active
+            if ($user['status'] !== 'active') {
+                echo json_encode(['error' => "Account has been deleted. Please contact support."]);
+                $stmt->close();
+                $conn->close();
+                exit;
+            }
         
             if (password_verify($password, $user['password'])) {
         
@@ -29,7 +37,7 @@
         
                 // redirect based on role
                 if ($user['user_type'] == 'admin') {
-                    $_SESSION['is_admin'] = 'admin';
+                    $_SESSION['is_admin'] = true;
                     echo json_encode(['success' => "Login successful!", 'role' => 'admin']);
                     //header("Location: pages/admin_dashboard.php");
                 } elseif ($user['user_type'] == 'staff') {

@@ -1,6 +1,12 @@
 <?php
-session_start();
-if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['username'])) {
+    header("Location: ../pages/login.php");
+    exit();
+}else if (isset($_SESSION['username']) && !isset($_SESSION['is_admin'])) {
     header("Location: ../pages/error_pages/access_denied.php");
     exit();
 }
@@ -30,29 +36,40 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
         <h4 class="text-white mb-4 text-center fw-bold">Canteen Admin</h4>
         <ul class="nav flex-column">
           <li class="nav-item mb-2">
-            <a href="#" class="nav-link text-white <?php if (isset($pageTitle) && $pageTitle === 'Admin Dashboard)'): ?> echo 'active'; <?php endif ?>">
+            <a href="../pages/dashboard.php" class="nav-link text-white <?= ($pageTitle === 'Admin Dashboard') ? 'active' : '' ?>">
               <i class="bi bi-speedometer2 me-2"></i> Dashboard
             </a>
           </li>
-          <li class="#" class="nav-link text-white <?php if (isset($pageTitle) && $pageTitle === 'Manage Orders)'): ?> echo 'active'; <?php endif ?>">
-              <i class="bi bi-airplane me-2"></i> Manage Orders
+          <li class="nav-item mb-2">
+            <a href="../pages/manage_orders.php" class="nav-link text-white <?= ($pageTitle === 'Manage Orders') ? 'active' : '' ?>">
+              <i class="bi bi-receipt-cutoff me-2"></i> Manage Orders
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="#" class="nav-link text-white <?php if (isset($pageTitle) && $pageTitle === 'Menu Management)'): ?> echo 'active'; <?php endif ?>">
-              <i class="bi bi-plus-circle me-2"></i> Menu Management
+            <a href="#" class="nav-link text-white <?= ($pageTitle === 'Menu Management') ? 'active' : '' ?>">
+              <i class="bi bi-list-ul me-2"></i> Menu Management
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="#" class="nav-link text-white <?php if (isset($pageTitle) && $pageTitle === 'Meal Plans)'): ?> echo 'active'; <?php endif ?>">
+            <a href="#" class="nav-link text-white<?= ($pageTitle === 'Meal Plans') ? 'active' : '' ?>">
               <i class="bi bi-journal-bookmark me-2"></i> Meal Plans
             </a>
           </li>
+            <li class="nav-item mb-2">
+                <a href="#" class="nav-link text-white <?= ($pageTitle === 'User Management') ? 'active' : '' ?>">
+                <i class="bi bi-people me-2"></i> User Management
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a href="#" class="nav-link text-white <?= ($pageTitle === 'Reports') ? 'active' : '' ?>">
+                <i class="bi bi-bar-chart-line me-2"></i> Reports
+                </a>
+            </li>
         </ul>
       </div>
       <div>
-        <a href="../processes/logout.php" class="btn btn-outline-light w-100 mt-3 logoutButton">
-          <i class="bi bi-box-arrow-right me-2"></i> Logout
+        <a href="menu.php" class="btn btn-outline-light w-100 mt-3 logoutButton">
+          <i class="bi bi-box-arrow-left me-2"></i> Back to Home
         </a>
       </div>
     </nav>
