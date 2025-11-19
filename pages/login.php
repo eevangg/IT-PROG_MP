@@ -27,7 +27,7 @@ if (isset($_SESSION['user_id'])) {
                 <input type="password" class="form-control" id="loginPassword" name="loginPassword" required>
                 <div class="invalid-feedback">Please input valid password</div>
             </div>
-            <div id="forgotPassword" class="form-text"><a href="#">Forgot Password?</a></div>
+            <div id="forgotPassword" class="form-text"><a href="forgot_password.php">Forgot Password?</a></div>
             <br>
 
             <div class="mb-3 ">

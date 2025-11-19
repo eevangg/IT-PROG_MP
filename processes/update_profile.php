@@ -27,15 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt1->execute();
     $result = $stmt1->get_result();
     if ($result->num_rows > 0) {
-        $stmt1->close();
-        $conn->close();
         echo json_encode(['status' => 'error', 'message' => 'Username or Email already taken by another user.']);
+        $stmt1->close();
         exit();
     }
 
     // Update user profile in the database
-    $userId = $_SESSION['user_id'];
-    $updateQuery = "UPDATE users SET username = ?, full_name = ?, email = ? WHERE id = ?";
+    $updateQuery = "UPDATE users SET username = ?, full_name = ?, email = ? WHERE user_id = ?";
     $stmt2 = $conn->prepare($updateQuery);
     $stmt2->bind_param("sssi", $username, $name, $email, $userId);
 

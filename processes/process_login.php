@@ -45,14 +45,14 @@
         
             } else {
                 echo json_encode(['error' => "Incorrect password!"]);
-                header("Location: login.php");
+                //header("Location: login.php");
                 $stmt->close();
                 $conn->close();
                 exit;
             }
         } else {
-            $_SESSION['error'] = "Email not found!";
-            header("Location: login.php");
+            echo json_encode(['error' => "Username not found!"]);
+            //header("Location: login.php");
             $stmt->close();
             $conn->close();
             exit;
