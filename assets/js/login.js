@@ -32,7 +32,7 @@
                     feedback.textContent += ' Redirecting to admin dashboard...';
                     window.setTimeout(() => {
                         feedback.textContent  = '';
-                        window.location.href = 'admin_dashboard.php';
+                        window.location.href = '../pages/admin_dashboad.php';
                     }, 2000);
                 }else if(result.role === 'student'){
                     window.setTimeout(() => {

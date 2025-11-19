@@ -68,7 +68,7 @@ if (!isset($_SESSION['username'])) {
                 <li><a class="dropdown-item" href="../processes/logout.php">Logout</a></li>
                 <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="admin_dashboard.php">Admin Dashboard</a></li>
+                  <li><a class="dropdown-item" href="../pages/admin_dashboard.php">Admin Dashboard</a></li>
                 <?php endif; ?>
               <?php else: ?>
                 <li><a class="dropdown-item" href="login.php">Sign In</a></li>
