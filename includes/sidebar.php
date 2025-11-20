@@ -36,32 +36,32 @@ if (!isset($_SESSION['username'])) {
         <h4 class="text-white mb-4 text-center fw-bold">Canteen Admin</h4>
         <ul class="nav flex-column">
           <li class="nav-item mb-2">
-            <a href="../pages/dashboard.php" class="nav-link text-white <?= ($pageTitle === 'Admin Dashboard') ? 'active' : '' ?>">
+            <a href="../pages/dashboard.php" class="nav-link text-white <?= ($pageTitle === 'Admin Dashboard - ArcherInnov Canteen Pre-order System') ? 'active' : '' ?>">
               <i class="bi bi-speedometer2 me-2"></i> Dashboard
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="../pages/manage_orders.php" class="nav-link text-white <?= ($pageTitle === 'Manage Orders') ? 'active' : '' ?>">
+            <a href="../pages/manage_orders.php" class="nav-link text-white <?= ($pageTitle === 'Manage Orders - ArcherInnov Canteen Pre-order System') ? 'active' : '' ?>">
               <i class="bi bi-receipt-cutoff me-2"></i> Manage Orders
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="#" class="nav-link text-white <?= ($pageTitle === 'Menu Management') ? 'active' : '' ?>">
+            <a href="#" class="nav-link text-white <?= ($pageTitle === 'Menu Management - ArcherInnov Canteen Pre-order System') ? 'active' : '' ?>">
               <i class="bi bi-list-ul me-2"></i> Menu Management
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="#" class="nav-link text-white<?= ($pageTitle === 'Meal Plans') ? 'active' : '' ?>">
+            <a href="#" class="nav-link text-white<?= ($pageTitle === 'Meal Plans - ArcherInnov Canteen Pre-order System') ? 'active' : '' ?>">
               <i class="bi bi-journal-bookmark me-2"></i> Meal Plans
             </a>
           </li>
             <li class="nav-item mb-2">
-                <a href="#" class="nav-link text-white <?= ($pageTitle === 'User Management') ? 'active' : '' ?>">
+                <a href="#" class="nav-link text-white <?= ($pageTitle === 'User Management - ArcherInnov Canteen Pre-order System') ? 'active' : '' ?>">
                 <i class="bi bi-people me-2"></i> User Management
                 </a>
             </li>
             <li class="nav-item mb-2">
-                <a href="#" class="nav-link text-white <?= ($pageTitle === 'Reports') ? 'active' : '' ?>">
+                <a href="#" class="nav-link text-white <?= ($pageTitle === 'Reports - ArcherInnov Canteen Pre-order System') ? 'active' : '' ?>">
                 <i class="bi bi-bar-chart-line me-2"></i> Reports
                 </a>
             </li>

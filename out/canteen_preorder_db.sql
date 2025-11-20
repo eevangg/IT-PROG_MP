@@ -23,9 +23,11 @@ USE `canteen_preorder_db` ;
 CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`menu_items` (
   `item_id` INT NOT NULL AUTO_INCREMENT,
   `item_name` VARCHAR(100) NOT NULL,
-  `category` ENUM('Breakfast', 'Lunch', 'Snack') NULL DEFAULT NULL,
+  `category` ENUM('Breakfast', 'Lunch', 'Snack', 'Beverage') NULL DEFAULT NULL,
   `price` DECIMAL(10,2) NOT NULL,
+  `stock` INT NOT NULL,
   `description` TEXT NULL DEFAULT NULL,
+  `image` VARCHAR(100) NULL DEFAULT NULL,
   `status` ENUM('active', 'inactive') NULL DEFAULT 'active',
   PRIMARY KEY (`item_id`))
 ENGINE = InnoDB
@@ -36,10 +38,10 @@ COLLATE = utf8mb4_general_ci;
 -- -----------------------------------------------------
 -- Sample Data for `menu_items`
 -- -----------------------------------------------------
-INSERT INTO `menu_items` (`item_name`, `category`, `price`, `description`, `status`) VALUES
-('Pancake Meal', 'Breakfast', 50.00, 'Fluffy pancakes with syrup', 'active'),
-('Chicken Adobo', 'Lunch', 85.00, 'Classic Filipino dish with rice', 'active'),
-('Tuna Sandwich', 'Snack', 40.00, 'Freshly made tuna sandwich', 'active');
+INSERT INTO `menu_items` (`item_name`, `category`, `price`, `stock`, `description`, `status`) VALUES
+('Pancake Meal', 'Breakfast', 50.00, 15, 'Fluffy pancakes with syrup', 'active'),
+('Chicken Adobo', 'Lunch', 85.00, 20, 'Classic Filipino dish with rice', 'active'),
+('Tuna Sandwich', 'Snack', 40.00, 25, 'Freshly made tuna sandwich', 'active');
 
 
 -- -----------------------------------------------------
@@ -126,9 +128,9 @@ COLLATE = utf8mb4_general_ci;
 -- Sample Data for `users`
 -- -----------------------------------------------------
 INSERT INTO `users` (`username`, `password`, `full_name`, `email`, `user_type`, `balance`, `status`) VALUES
-('jason123', 'password123', 'Jason Dela Cruz', 'jason@example.com', 'student', 500.00, 'active'),
-('anna_smith', 'pass456', 'Anna Smith', 'anna@example.com', 'staff', 800.00, 'active'),
-('admin', 'adminpass', 'System Admin', 'admin@example.com', 'admin', 0.00, 'active');
+('jason123', '$2y$10$RZQVgh0V1SMfcdguFkhYduDfmlFI9DzxCkOEv8vsyPES.ZrQ1qBfu', 'Jason Dela Cruz', 'jason@example.com', 'student', 500.00, 'active'),
+('anna_smith', '$2y$10$ZtsnDpNAha37HyXo9GHPA.gd.cLsyPg3.hf8hrLd.bnS4RrGGh.Jm', 'Anna Smith', 'anna@example.com', 'staff', 800.00, 'active'),
+('admin', '$2y$10$9nKNc35ugeGlJiOZ78Yhs.QLy6FI0EZb8kc6vhniZDOebZxHt.Lgi', 'System Admin', 'admin@email.com', 'admin', 100.00, 'active');
 
 
 -- -----------------------------------------------------
@@ -235,6 +237,65 @@ INSERT INTO `payments` (`order_id`, `payment_method`, `amount_paid`, `payment_st
 (2, 'cash', 85.00, 'paid'),
 (3, 'qr', 40.00, 'pending');
 
+
+-- -----------------------------------------------------
+-- Table `canteen_preorder_db`.`cart`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`cart` (
+  `cart_id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`cart_id`),
+  CONSTRAINT `cart_ibfk_1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `canteen_preorder_db`.`users` (`user_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+-- -----------------------------------------------------
+-- Sample Data for `cart`
+-- -----------------------------------------------------
+INSERT INTO `cart` (`user_id`) VALUES (1), (2);
+
+-- -----------------------------------------------------
+-- Table `canteen_preorder_db`.`cart_items`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`cart_items` (
+  `cart_item_id` INT NOT NULL AUTO_INCREMENT,
+  `cart_id` INT NOT NULL,
+  `item_id` INT NOT NULL,
+  `quantity` INT NOT NULL DEFAULT 1,
+  `subtotal` DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (`cart_item_id`),
+  INDEX `cart_id` (`cart_id` ASC),
+  INDEX `item_id` (`item_id` ASC),
+  CONSTRAINT `cart_items_ibfk_1`
+    FOREIGN KEY (`cart_id`)
+    REFERENCES `canteen_preorder_db`.`cart` (`cart_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `cart_items_ibfk_2`
+    FOREIGN KEY (`item_id`)
+    REFERENCES `canteen_preorder_db`.`menu_items` (`item_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+-- -----------------------------------------------------
+-- Sample Data for `cart_items`
+-- -----------------------------------------------------
+INSERT INTO `cart_items` (`cart_id`, `item_id`, `quantity`, `subtotal`) VALUES
+(1, 1, 2, 100.00),
+(1, 3, 1, 40.00),
+(2, 2, 1, 85.00);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
