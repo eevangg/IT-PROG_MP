@@ -94,12 +94,19 @@ document.addEventListener('DOMContentLoaded', function() {
             type: type
         };
 
+        const formData = new FormData();
+        formData.append('order_id', id);
+        formData.append('type', type);
+
+
         if (type === 'status') {
             newValue = document.getElementById(`statusSelect-${id}`).value;
             payload.status = newValue;
+            formData.append('status', newValue);
         } else if (type === 'payment') {
             newValue = document.getElementById(`paymentSelect-${id}`).value;
             payload.payment_status = newValue;
+            formData.append('payment_status', newValue);
         }
 
         try {
@@ -108,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload),
+                body: formData,
             });
             const data = await response.json();
 
@@ -130,6 +137,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     edit.classList.add("d-none");
                     display.classList.remove("d-none");
                     showToast(data.message, true);
+
+                    // If status changed to completed or cancelled, disable payment edit
+                    if (newValue === "completed" || newValue === "cancelled") {
+                        const paymentEditBtn = document.querySelector(`.editPaymentBtn[data-id='${id}']`);
+                        if (paymentEditBtn) {
+                            paymentEditBtn.classList.add("disabled");
+                            paymentEditBtn.setAttribute("title", "Cannot edit payment status for completed or cancelled orders");
+                        }
+                    }
+
+                    // If status changed from completed or cancelled to something else, enable payment edit
+                    else {
+                        const paymentEditBtn = document.querySelector(`.editPaymentBtn[data-id='${id}']`);
+                        if (paymentEditBtn) {
+                            paymentEditBtn.classList.remove("disabled");
+                            paymentEditBtn.removeAttribute("title");
+                        }
+                    }
+
                 } else if (type === 'payment') {
                     // Update display badge
                     const display = document.getElementById(`paymentDisplay-${id}`);
@@ -168,4 +194,63 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Handle delete order
+    document.addEventListener("click", async (e) => {
+        const deleteBtn = e.target.closest(".deleteOrderBtn");
+        if (!deleteBtn) return;
+
+        const id = deleteBtn.dataset.id;
+
+        const toast = new bootstrap.Toast(document.getElementById('deleteOrderToast'));
+        toast.show();
+
+        const deleteForm = document.getElementById('deleteOrderForm');
+        if (!deleteForm) return;
+        
+        deleteForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch('../../processes/admin-processes/delete_order.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ order_id: id }),
+                });
+                const data = await response.json();
+    
+                if (data.status === 'success') {
+                    // Remove the order row from the table
+                    const row = document.getElementById(`order-${id}`);
+                    const itemsRow = document.getElementById(`item-${id}`);
+                    if (row) {
+                        row.remove();
+                    }
+                    if (itemsRow) {
+                        itemsRow.remove();
+                    }
+                    showToast(data.message, true);
+                    toast.hide();
+                    
+                    // update order count
+                    const orderCountEl = document.getElementById('orderCount');
+                    if (orderCountEl) {
+                        let count = parseInt(orderCountEl.textContent);
+                        count = isNaN(count) ? 0 : count - 1;
+                        orderCountEl.textContent = count;
+                    }
+                } else {
+                    showToast(data.message, false);
+                    toast.hide();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while deleting the order.', false); 
+                toast.hide();
+            }
+        });
+        
+    });
 });

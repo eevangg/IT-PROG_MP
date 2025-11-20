@@ -4,12 +4,14 @@
     include('../../config/db.php');
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $data = json_decode(file_get_contents("php://input"), true);
+        $raw = file_get_contents("php://input");
 
-        $orderId = intval($data['order_id']);
-        $status = $data['status'] ?? '';
-        $paymentStatus = $data['payment_status'] ?? '';
-        $type = $data['type'] ?? '';
+        $data = json_decode($raw, true);
+
+        $orderId = $_POST['order_id'];
+        $status = $_POST['status'];
+        $paymentStatus = $_POST['payment_status'] ;
+        $type = $_POST['type'];
 
         // Validate inputs
         if (empty($orderId) || empty($type)) {
