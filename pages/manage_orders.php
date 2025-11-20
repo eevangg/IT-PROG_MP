@@ -65,11 +65,11 @@ include('../includes/sidebar.php');
         <div class="col-md-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
-            <div class="text-muted small mb-1">Quick Links</div>
-            <div class="d-flex gap-2 flex-wrap">
-                <a href="/admin" class="btn btn-outline-success btn-sm"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
-                <a href="/admin/reservations" class="btn btn-outline-success btn-sm"><i class="bi bi-journal-bookmark me-1"></i>Reservations</a>
-            </div>
+                <div class="text-muted small mb-1">Quick Links</div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="dashboard.php" class="btn btn-outline-success btn-sm"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+                    <a href="manage_menu.php" class="btn btn-outline-success btn-sm"><i class="bi bi-list-ul me-1"></i>Manage Menu</a>
+                </div>
             </div>
         </div>
         </div>
@@ -100,43 +100,42 @@ include('../includes/sidebar.php');
             <tbody id="ordersTable">
             <?php foreach ($orders as $order): ?>
                 <?php
-                // Fetch customer name
-                $customerId = $order['user_id'];
-                $customerSql = "SELECT full_name FROM users WHERE user_id = ?";
-                $customerStmt = $conn->prepare($customerSql);
-                $customerStmt->bind_param("i", $customerId);
-                $customerStmt->execute();
-                $customerResult = $customerStmt->get_result();
-                $customer = $customerResult->fetch_assoc();
-                $order['origin'] = $customer['full_name'];
+                    // Fetch customer name
+                    $customerId = $order['user_id'];
+                    $customerSql = "SELECT full_name FROM users WHERE user_id = ?";
+                    $customerStmt = $conn->prepare($customerSql);
+                    $customerStmt->bind_param("i", $customerId);
+                    $customerStmt->execute();
+                    $customerResult = $customerStmt->get_result();
+                    $customer = $customerResult->fetch_assoc();
+                    $order['origin'] = $customer['full_name'];
 
-                // Determine order items
-                $itemsSql = "SELECT item_name, quantity, price 
-                             FROM menu_items mi
-                             JOIN order_details od ON mi.item_id = od.item_id
-                             JOIN orders o ON od.order_id = o.order_id
-                             WHERE o.order_id = ?";
+                    // Determine order items
+                    $itemsSql = "SELECT item_name, quantity, price 
+                                FROM menu_items mi
+                                JOIN order_details od ON mi.item_id = od.item_id
+                                JOIN orders o ON od.order_id = o.order_id
+                                WHERE o.order_id = ?";
 
-                $itemsStmt = $conn->prepare($itemsSql);
-                $itemsStmt->bind_param("i", $order['order_id']);
-                $itemsStmt->execute();
-                $itemsResult = $itemsStmt->get_result();
-                $items = [];
-                while ($itemRow = $itemsResult->fetch_assoc()) {
-                    $items[] = $itemRow['item_name'] . " (x" . $itemRow['quantity'] . ")" . " - ₱" . $itemRow['price'];
-                }
+                    $itemsStmt = $conn->prepare($itemsSql);
+                    $itemsStmt->bind_param("i", $order['order_id']);
+                    $itemsStmt->execute();
+                    $itemsResult = $itemsStmt->get_result();
+                    $items = [];
+                    while ($itemRow = $itemsResult->fetch_assoc()) {
+                        $items[] = $itemRow['item_name'] . " (x" . $itemRow['quantity'] . ")" . " - ₱" . $itemRow['price'];
+                    }
 
-                 // Determine Payment Status
-                 $paymentSql = "SELECT * FROM payments WHERE order_id = ?";
-                 $paymentStmt = $conn->prepare($paymentSql);
-                 $paymentStmt->bind_param("i", $order['order_id']);
-                 $paymentStmt->execute();
-                 $paymentStatusResult = $paymentStmt->get_result();
-                    if ($paymentStatusResult->num_rows > 0) {
-                        $payment = $paymentStatusResult->fetch_assoc();
-                        $order['payment_status'] = $payment['status'];
+                    // Determine Payment Status
+                    $paymentSql = "SELECT payment_status FROM payments WHERE order_id = ?";
+                    $paymentStmt = $conn->prepare($paymentSql);
+                    $paymentStmt->bind_param("i", $order['order_id']);
+                    $paymentStmt->execute();
+                    $paymentResult = $paymentStmt->get_result();
+                    if ($paymentRow = $paymentResult->fetch_assoc()) {
+                        $order['payment_status'] = $paymentRow['payment_status'];
                     } else {
-                        $order['payment_status'] = 'N/A';
+                        $order['payment_status'] = 'pending';
                     }
                 ?>
 
@@ -154,15 +153,15 @@ include('../includes/sidebar.php');
                     <td>
                         <!-- Payment Status Display mode -->
                         <div class="payment-display" id="paymentDisplay-<?=$order['order_id']?>"></div>
-                            <span class="badge
+                            <span class="badge payment-badge
                                 <?php if($order['payment_status'] === 'paid'):?>bg-success<?php endif; ?>
                                 <?php if($order['payment_status'] === 'pending'):?> bg-warning text-dark<?php endif; ?>
                                 <?php if($order['payment_status'] === 'failed'):?>bg-danger<?php endif; ?>
                                 <?php if($order['payment_status'] === 'refunded'):?>bg-secondary<?php endif; ?>
                                 ">
                             <?=$order['payment_status']?>
-                            </span>
-                            <button class="btn btn-sm btn-outline-primary ms-1 editStatusBtn" data-id="<?=$order['order_id']?>" title="Edit Payment Status">
+                            </span> <br>
+                            <button class="btn btn-sm btn-outline-primary ms-1 editPaymentBtn" data-id="<?=$order['order_id']?>"  data-type="payment" title="Edit Payment Status">
                                 <i class="bi bi-pencil"></i>
                             </button>
                         </div>
@@ -177,7 +176,7 @@ include('../includes/sidebar.php');
                             <button class="btn btn-sm btn-success me-1 savePaymentBtn" data-id="<?=$order['order_id']?>">
                                 <i class="bi bi-check2"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary cancelPaymentBtn" data-id="<?=$order['order_id']?>">
+                            <button class="btn btn-sm btn-outline-success cancelPaymentBtn" data-id="<?=$order['order_id']?>" data-type="payment" >
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
@@ -190,15 +189,15 @@ include('../includes/sidebar.php');
                     <td>
                         <!-- Order Status Display mode -->
                         <div class="status-display" id="statusDisplay-<?=$order['order_id']?>"></div>
-                            <span class="badge
+                            <span class="badge status-badge
                                 <?php if($order['status'] === 'ready' || $order['status'] === 'completed'):?>bg-success<?php endif; ?>
                                 <?php if($order['status'] === 'confirmed'):?> bg-warning text-dark<?php endif; ?>
                                 <?php if($order['status'] === 'cancelled'):?>bg-danger<?php endif; ?>
                                 <?php if($order['status'] === 'pending' || $order['status'] === 'preparing'):?>bg-secondary<?php endif; ?>
                                 ">
                             <?=$order['status']?>
-                            </span>
-                            <button class="btn btn-sm btn-outline-primary ms-1 editStatusBtn" data-id="<?=$order['order_id']?>" title="Edit Status">
+                            </span> <br>
+                            <button class="btn btn-sm btn-outline-success ms-1 editStatusBtn" data-id="<?=$order['order_id']?>" data-type="status" title="Edit Status">
                                 <i class="bi bi-pencil"></i>
                             </button>
                         </div>
@@ -215,16 +214,13 @@ include('../includes/sidebar.php');
                             <button class="btn btn-sm btn-success me-1 saveStatusBtn" data-id="<?=$order['order_id']?>">
                                 <i class="bi bi-check2"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary cancelStatusBtn" data-id="<?=$order['order_id']?>">
+                            <button class="btn btn-sm btn-outline-secondary cancelStatusBtn" data-id="<?=$order['order_id']?>" data-type="status" >
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
 
                     </td>
                     <td>
-                        <a href="#" class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </a>
                         <button class="btn btn-sm btn-outline-danger deleteFlightBtn" data-id="<?=$order['order_id']?>" title="Delete">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -287,6 +283,16 @@ include('../includes/sidebar.php');
         
     
 </main>
+
+<!-- confirmation toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  <div id="toast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="toastBody"></div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
 
 
 <?php include ('../includes/closing.php');
