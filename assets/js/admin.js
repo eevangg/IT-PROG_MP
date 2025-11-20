@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const response = await fetch('../processes/update_order.php', {
+            const response = await fetch('../../processes/admin-processes/update_order.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -156,4 +156,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Handle search filter for orders
+    const orderFilter = document.getElementById('orderFilter');
+    if (orderFilter) {
+        orderFilter.addEventListener('keyup', function () {
+            const query = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#ordersTable tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    }
 });

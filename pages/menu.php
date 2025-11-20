@@ -41,13 +41,13 @@ include('../includes/header.php');
                 <br>
                 <p class="card-text"><strong>Available Stock:</strong> <?= $item['stock']?></p>
                 <div class="mt-auto">
-                    <a href="order.php?id=<?= $item['id'] ?>" class="btn btn-success d-grid gap-2">Order</a>
+                    <a href="order.php?id=<?= $item['id'] ?>" class="btn btn-success d-grid gap-2"><i class="bi bi-cart-plus"> add to cart</i></a>
                 </div>
               </div>
             </div>
           </div>
     <?php endforeach;  echo '</div>' ?>
-
+    <?php $conn->close(); ?>
 
   </div>
 </section>

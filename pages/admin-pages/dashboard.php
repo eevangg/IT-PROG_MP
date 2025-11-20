@@ -2,7 +2,7 @@
 <?php
 session_start();
 $pageTitle = "Admin Dashboard - ArcherInnov Canteen Pre-order System";
-include('../includes/sidebar.php'); 
+include('../../includes/sidebar.php'); 
 ?>
 
 <main class="admin-content container my-5 fullHeight d-flex flex-column align-items-center justify-content-start">
@@ -11,12 +11,12 @@ include('../includes/sidebar.php');
   <div class="d-flex justify-content-between align-items-center w-100 mb-3">
     <div class="d-flex align-items-center gap-2">
       <!-- Back to Homepage Button -->
-      <a href="menu.php" class="btn btn-outline-success btn-sm shadow-sm">
+      <a href="../menu.php" class="btn btn-outline-success btn-sm shadow-sm">
         <i class="bi bi-house-door me-1"></i> Home
       </a>
     </div>
     <h1 class="text-center flex-grow-1 fw-bold text-success">Admin Dashboard</h1>
-    <a href="../processes/logout.php" class="btn btn-outline-success btn-sm shadow-sm logoutButton">Logout</a>
+    <a href="../../processes/logout.php" class="btn btn-outline-success btn-sm shadow-sm logoutButton">Logout</a>
   </div>
 
   <!-- Welcome Section -->
@@ -26,13 +26,14 @@ include('../includes/sidebar.php');
   </div>
 
   <?php
-    include ('../config/db.php');
+    include ('../../config/db.php');
     // Fetch summary data
     $totalOrders = $conn->query("SELECT COUNT(*) as count FROM orders")->fetch_assoc()['count'];
     $activeMenu = $conn->query("SELECT COUNT(*) as count FROM menu_items WHERE status = 'active'")->fetch_assoc()['count'];
     $totalUsers = $conn->query("SELECT COUNT(*) as count FROM users WHERE status = 'active'")->fetch_assoc()['count'];
     $payments = $conn->query("SELECT COUNT(*) as count FROM payments WHERE DATE(payment_date) = CURDATE()")->fetch_assoc()['count'];
 
+    $conn->close();
   ?>
 
   <br>
@@ -78,7 +79,7 @@ include('../includes/sidebar.php');
       <h3 class="text-center fw-bold text-success">Quick Actions</h3>
       <br>
       <a href="manage_orders.php" class="btn btn-success mx-2">Manage Orders</a>
-      <a href="#" class="btn btn-success mx-2">Manage Menu</a>
+      <a href="manage_menu.php" class="btn btn-success mx-2">Manage Menu</a>
       <a href="#" class="btn btn-success mx-2">Meal Plans</a>
       <a href="#" class="btn btn-success mx-2">User Management</a>
       <a href="#" class="btn btn-success mx-2">View Reports</a>
@@ -91,4 +92,4 @@ include('../includes/sidebar.php');
 
 
 
-<?php include('../includes/closing.php'); ?>
+<?php include('../../includes/closing.php'); ?>

@@ -1,7 +1,7 @@
 <?php
 session_start();
 $pageTitle = "Manage Orders - ArcherInnov Canteen Pre-order System";
-include('../includes/sidebar.php'); 
+include('../../includes/sidebar.php'); 
 ?>
 
 <main class="admin-content container my-5 fullHeight d-flex flex-column align-items-center justify-content-start">
@@ -9,7 +9,7 @@ include('../includes/sidebar.php');
     <div class="d-flex justify-content-between align-items-center w-100 mb-3">
         <div class="d-flex align-items-center gap-2">
         <!-- Back to Homepage Button -->
-        <a href="menu.php" class="btn btn-outline-success btn-sm shadow-sm">
+        <a href="../menu.php" class="btn btn-outline-success btn-sm shadow-sm">
             <i class="bi bi-house-door me-1"></i> Home
         </a>
         </div>
@@ -19,19 +19,19 @@ include('../includes/sidebar.php');
         </button>
     </div>
     <?php
-    include ('../config/db.php');
-    // Fetch summary data
-    $totalOrders = $conn->query("SELECT COUNT(*) as count FROM orders")->fetch_assoc()['count'];
+    include ('../../config/db.php');
+        // Fetch summary data
+        $totalOrders = $conn->query("SELECT COUNT(*) as count FROM orders")->fetch_assoc()['count'];
 
-    $sql = "SELECT * FROM orders ORDER BY order_date DESC";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $orders = [];
-    while ($row = $result->fetch_assoc()) {
-        $orders[] = $row;
-    }
-
+        $sql = "SELECT * FROM orders ORDER BY order_date DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $orders = [];
+        while ($row = $result->fetch_assoc()) {
+            $orders[] = $row;
+        }
+        $stmt->close();
     ?>
     <!-- Summary Cards -->
     <div class="row g-3 mb-3 w-100">
@@ -56,7 +56,7 @@ include('../includes/sidebar.php');
                 <span class="input-group-text bg-success text-white border-success">
                 <i class="bi bi-search"></i>
                 </span>
-                <input type="text" id="flightFilter" class="form-control" placeholder="Search order id, plan id, date...">
+                <input type="text" id="orderFilter" class="form-control" placeholder="Search order id, plan id, date...">
             </div>
             <div class="form-text">Tip: Try order id or order date.</div>
             </div>
@@ -111,11 +111,10 @@ include('../includes/sidebar.php');
                     $order['origin'] = $customer['full_name'];
 
                     // Determine order items
-                    $itemsSql = "SELECT item_name, quantity, price 
+                    $itemsSql = "SELECT mi.item_name, od.quantity, mi.price 
                                 FROM menu_items mi
                                 JOIN order_details od ON mi.item_id = od.item_id
-                                JOIN orders o ON od.order_id = o.order_id
-                                WHERE o.order_id = ?";
+                                WHERE od.order_id = ?";
 
                     $itemsStmt = $conn->prepare($itemsSql);
                     $itemsStmt->bind_param("i", $order['order_id']);
@@ -137,6 +136,10 @@ include('../includes/sidebar.php');
                     } else {
                         $order['payment_status'] = 'pending';
                     }
+
+                    $customerStmt->close();
+                    $itemsStmt->close();
+                    $paymentStmt->close();
                 ?>
 
                 <tr id="order-<?=$order['order_id']?>" class="text-center">
@@ -152,7 +155,7 @@ include('../includes/sidebar.php');
                     
                     <td>
                         <!-- Payment Status Display mode -->
-                        <div class="payment-display" id="paymentDisplay-<?=$order['order_id']?>"></div>
+                        <div class="payment-display" id="paymentDisplay-<?=$order['order_id']?>">
                             <span class="badge payment-badge
                                 <?php if($order['payment_status'] === 'paid'):?>bg-success<?php endif; ?>
                                 <?php if($order['payment_status'] === 'pending'):?> bg-warning text-dark<?php endif; ?>
@@ -161,7 +164,7 @@ include('../includes/sidebar.php');
                                 ">
                             <?=$order['payment_status']?>
                             </span> <br>
-                            <button class="btn btn-sm btn-outline-primary ms-1 editPaymentBtn" data-id="<?=$order['order_id']?>"  data-type="payment" title="Edit Payment Status">
+                            <button class="btn btn-sm btn-outline-success ms-1 editPaymentBtn" data-id="<?=$order['order_id']?>"  data-type="payment" title="Edit Payment Status">
                                 <i class="bi bi-pencil"></i>
                             </button>
                         </div>
@@ -170,7 +173,7 @@ include('../includes/sidebar.php');
                             <select class="form-select form-select-sm d-inline-block w-auto me-2" id="paymentSelect-<?=$order['order_id']?>">
                                 <option value="paid" <?php if($order['payment_status'] === 'paid'):?>selected<?php endif; ?>>Paid</option>
                                 <option value="failed" <?php if($order['payment_status'] === 'failed'):?>selected<?php endif; ?>>Failed</option>
-                                <option value="Pending" <?php if($order['payment_status'] === 'pending'):?>selected<?php endif; ?>>Pending</option>
+                                <option value="pending" <?php if($order['payment_status'] === 'pending'):?>selected<?php endif; ?>>Pending</option>
                                 <option value="refunded" <?php if($order['payment_status'] === 'refunded'):?>selected<?php endif; ?>>Refunded</option>
                             </select>
                             <button class="btn btn-sm btn-success me-1 savePaymentBtn" data-id="<?=$order['order_id']?>">
@@ -214,7 +217,7 @@ include('../includes/sidebar.php');
                             <button class="btn btn-sm btn-success me-1 saveStatusBtn" data-id="<?=$order['order_id']?>">
                                 <i class="bi bi-check2"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary cancelStatusBtn" data-id="<?=$order['order_id']?>" data-type="status" >
+                            <button class="btn btn-sm btn-outline-success cancelStatusBtn" data-id="<?=$order['order_id']?>" data-type="status" >
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
@@ -280,7 +283,7 @@ include('../includes/sidebar.php');
         </div>
     <?php endif; ?>
     </div>
-        
+    <?php $conn->close(); ?>
     
 </main>
 
@@ -295,4 +298,4 @@ include('../includes/sidebar.php');
 </div>
 
 
-<?php include ('../includes/closing.php');
+<?php include ('../../includes/closing.php');
