@@ -83,13 +83,14 @@ include('../includes/sidebar.php');
         <div class="card-body">
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle">
-            <thead class="table-danger text-center">
+            <thead class="table-success text-center">
                 <tr>
                 <th>Order ID</th>
                 <th>Customer Name</th>
                 <th>Order Date</th>
                 <th>Order Items</th>
                 <th>Payment Method</th>
+                <th>Payment Status</th>
                 <th>Pickup Time</th>
                 <th>Total Amount (₱)</th>
                 <th>Status</th>
@@ -110,7 +111,7 @@ include('../includes/sidebar.php');
                 $order['origin'] = $customer['full_name'];
 
                 // Determine order items
-                $itemsSql = "SELECT item_name, quantity 
+                $itemsSql = "SELECT item_name, quantity, price 
                              FROM menu_items mi
                              JOIN order_details od ON mi.item_id = od.item_id
                              JOIN orders o ON od.order_id = o.order_id
@@ -122,61 +123,151 @@ include('../includes/sidebar.php');
                 $itemsResult = $itemsStmt->get_result();
                 $items = [];
                 while ($itemRow = $itemsResult->fetch_assoc()) {
-                    $items[] = $itemRow['item_name'] . " (x" . $itemRow['quantity'] . ")";
+                    $items[] = $itemRow['item_name'] . " (x" . $itemRow['quantity'] . ")" . " - ₱" . $itemRow['price'];
                 }
+
+                 // Determine Payment Status
+                 $paymentSql = "SELECT * FROM payments WHERE order_id = ?";
+                 $paymentStmt = $conn->prepare($paymentSql);
+                 $paymentStmt->bind_param("i", $order['order_id']);
+                 $paymentStmt->execute();
+                 $paymentStatusResult = $paymentStmt->get_result();
+                    if ($paymentStatusResult->num_rows > 0) {
+                        $payment = $paymentStatusResult->fetch_assoc();
+                        $order['payment_status'] = $payment['status'];
+                    } else {
+                        $order['payment_status'] = 'N/A';
+                    }
                 ?>
+
                 <tr id="order-<?=$order['order_id']?>" class="text-center">
-                <td class="fw-semibold"><?=$order['order_id']?></td>
-                <td><?=$order['origin']?></td>
-                <td><?=$order['order_date']?></td>
-                <td>
-                    <button class="btn btn-sm btn-outline-secondary ms-1 toggleRoute" data-id="<?=$order['order_id']?>" title="View Order Items">
-                        <i class="bi bi-caret-down"></i>
-                    </button>
-                </td>
-                <td><?=$order['payment_method']?></td>
-                <td><?=$order['pickup_time']?></td>
-                <td><?=$order['total_amount']?></td>
-                <td>
-                    <span class="badge
-                        <?php if($order['status'] === 'ready' || $order['status'] === 'completed'):?>bg-success<?php endif; ?>
-                        <?php if($order['status'] === 'confirmed'):?> bg-warning text-dark<?php endif; ?>
-                        <?php if($order['status'] === 'cancelled'):?>bg-danger<?php endif; ?>
-                        <?php if($order['status'] === 'pending' || $order['status'] === 'preparing'):?>bg-secondary<?php endif; ?>
-                        ">
-                    <?=$order['status']?>
-                    </span>
-                </td>
-                <td>
-                    <a href="#" class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                    <i class="bi bi-pencil"></i>
-                    </a>
-                    <button class="btn btn-sm btn-outline-danger deleteFlightBtn" data-id="<?=$order['order_id']?>" title="Delete">
-                    <i class="bi bi-trash"></i>
-                    </button>
-                </td>
+                    <td class="fw-semibold"><?=$order['order_id']?></td>
+                    <td><?=$order['origin']?></td>
+                    <td><?=$order['order_date']?></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary ms-1 toggleItems" data-id="<?=$order['order_id']?>" title="View Order Items">
+                            <i class="bi bi-caret-down"></i>
+                        </button>
+                    </td>
+                    <td><?=$order['payment_method']?></td>
+                    
+                    <td>
+                        <!-- Payment Status Display mode -->
+                        <div class="payment-display" id="paymentDisplay-<?=$order['order_id']?>"></div>
+                            <span class="badge
+                                <?php if($order['payment_status'] === 'paid'):?>bg-success<?php endif; ?>
+                                <?php if($order['payment_status'] === 'pending'):?> bg-warning text-dark<?php endif; ?>
+                                <?php if($order['payment_status'] === 'failed'):?>bg-danger<?php endif; ?>
+                                <?php if($order['payment_status'] === 'refunded'):?>bg-secondary<?php endif; ?>
+                                ">
+                            <?=$order['payment_status']?>
+                            </span>
+                            <button class="btn btn-sm btn-outline-primary ms-1 editStatusBtn" data-id="<?=$order['order_id']?>" title="Edit Payment Status">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <!-- Edit mode -->
+                        <div class="payment-edit d-none" id="paymentEdit-<?=$order['order_id']?>">
+                            <select class="form-select form-select-sm d-inline-block w-auto me-2" id="paymentSelect-<?=$order['order_id']?>">
+                                <option value="paid" <?php if($order['payment_status'] === 'paid'):?>selected<?php endif; ?>>Paid</option>
+                                <option value="failed" <?php if($order['payment_status'] === 'failed'):?>selected<?php endif; ?>>Failed</option>
+                                <option value="Pending" <?php if($order['payment_status'] === 'pending'):?>selected<?php endif; ?>>Pending</option>
+                                <option value="refunded" <?php if($order['payment_status'] === 'refunded'):?>selected<?php endif; ?>>Refunded</option>
+                            </select>
+                            <button class="btn btn-sm btn-success me-1 savePaymentBtn" data-id="<?=$order['order_id']?>">
+                                <i class="bi bi-check2"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary cancelPaymentBtn" data-id="<?=$order['order_id']?>">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+
+                    </td>
+
+                    <td><?=$order['pickup_time']?></td>
+                    <td><?=number_format($order['total_amount'], 2)?></td>
+
+                    <td>
+                        <!-- Order Status Display mode -->
+                        <div class="status-display" id="statusDisplay-<?=$order['order_id']?>"></div>
+                            <span class="badge
+                                <?php if($order['status'] === 'ready' || $order['status'] === 'completed'):?>bg-success<?php endif; ?>
+                                <?php if($order['status'] === 'confirmed'):?> bg-warning text-dark<?php endif; ?>
+                                <?php if($order['status'] === 'cancelled'):?>bg-danger<?php endif; ?>
+                                <?php if($order['status'] === 'pending' || $order['status'] === 'preparing'):?>bg-secondary<?php endif; ?>
+                                ">
+                            <?=$order['status']?>
+                            </span>
+                            <button class="btn btn-sm btn-outline-primary ms-1 editStatusBtn" data-id="<?=$order['order_id']?>" title="Edit Status">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+                        <!-- Edit mode -->
+                        <div class="status-edit d-none" id="statusEdit-<?=$order['order_id']?>">
+                            <select class="form-select form-select-sm d-inline-block w-auto me-2" id="statusSelect-<?=$order['order_id']?>">
+                                <option value="confirmed" <?php if($order['status'] === 'confirmed'):?>selected<?php endif; ?>>Confirmed</option>
+                                <option value="cancelled" <?php if($order['status'] === 'cancelled'):?>selected<?php endif; ?>>Cancelled</option>
+                                <option value="pending" <?php if($order['status'] === 'pending'):?>selected<?php endif; ?>>Pending</option>
+                                <option value="preparing" <?php if($order['status'] === 'preparing'):?>selected<?php endif; ?>>Preparing</option>
+                                <option value="ready" <?php if($order['status'] === 'ready'):?>selected<?php endif; ?>>Ready</option>
+                                <option value="completed" <?php if($order['status'] === 'completed'):?>selected<?php endif; ?>>Completed</option>
+                            </select>
+                            <button class="btn btn-sm btn-success me-1 saveStatusBtn" data-id="<?=$order['order_id']?>">
+                                <i class="bi bi-check2"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary cancelStatusBtn" data-id="<?=$order['order_id']?>">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger deleteFlightBtn" data-id="<?=$order['order_id']?>" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
                 </tr>
 
                 <!-- Expandable Order Items Row -->
-                <tr class="items-row d-none" id="items-<?=$order['order_id']?>">
+                <tr class="items-row d-none" id="item-<?=$order['order_id']?>">
                 <td colspan="9">
                     <div class="p-3 bg-light rounded border">
                     <div class="fw-semibold mb-2">Order Items</div>
                     <?php if(count($items) > 0):?>
-                        <div class="row row-cols-1 row-cols-md-2 g-2">
-                        <?php foreach($items as $item): ?>
-                            <div class="col">
-                            <div class="p-2 bg-white rounded border">
-                                <div><strong>Flight Number:</strong> {{this.flightNumber}}</div>
-                                <div><strong>Route:</strong> {{this.origin}} → {{this.destination}}</div>
-                                <div><strong>Aircraft:</strong> {{this.aircraft}}</div>
-                                <div><strong>Depart:</strong> {{this.departureDate}}</div>
-                            </div>
-                            </div>
-                        <?php endforeach; ?>
-                        </div>
+                        <!--div class="row row-cols-1 row-cols-md-2 g-2"-->
+                        <table class="table table-bordered">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach($items as $item): ?>
+                            <!--div class="col" -->
+                                <tr>
+                                    <?php
+                                        // Extract item name and quantity and price
+                                        preg_match('/^(.*?) \(x(\d+)\) - ₱([\d\.]+)$/', $item, $matches);
+                                        $itemName = $matches[1];
+                                        $quantity = $matches[2];
+                                        $price = $matches[3];   
+                                    ?>
+                                    <td><?=htmlspecialchars($itemName)?></td>
+                                    <td><?=htmlspecialchars($quantity)?></td>
+                                    <td>₱<?=htmlspecialchars(number_format($price, 2))?></td>
+                                </tr>
+                                <!--/div-->
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <!--/div-->
                     <?php else: ?>
-                        <div class="text-muted">No Routes details available.</div>
+                        <div class="text-muted">No Item details available.</div>
                     <?php endif; ?>
                     </div>
                 </td>
