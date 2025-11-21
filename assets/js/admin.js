@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
      icon.classList.toggle("bi-caret-up", !isOpen);
    });
 
+
+   // Function to show toast notifications
    function showToast(message, success = true) {
         const toastEl = document.getElementById("toast");
         const toastBody = document.getElementById("toastBody");
@@ -41,19 +43,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
         new bootstrap.Toast(toastEl, { delay: 2500 }).show();
   }
+
+  // function to show delete confirmation toast
+  function showDeleteToast(message) {
+        const deleteToastEl = document.getElementById("deleteToast");
+        const deleteToastAlert = deleteToastEl.querySelector("#deleteToastAlert");
+        if (!deleteToastEl || !deleteToastAlert) return;
+
+        deleteToastAlert.innerHTML = message;
+    
+       // Show toast
+        const toast = new bootstrap.Toast(deleteToastEl, { delay: 5000 });
+        toast.show();
+  }
  
 
-   //  Inline status and payment status edit: enter edit mode
+
+   //  Inline order status, payment status and menu item status edit: enter edit mode
     document.addEventListener("click", (e) => {
-        const editBtn = e.target.closest(".editStatusBtn, .editPaymentBtn");
+        const editBtn = e.target.closest(".editStatusBtn, .editPaymentBtn, .editItemStatusBtn");
         if (!editBtn) return;   
 
         const id = editBtn.dataset.id;
-        const type = editBtn.dataset.type; // 'status' or 'payment'
+        const type = editBtn.dataset.type; // 'status', 'payment' or 'itemStatus'
 
         // close all other edit modes
-        document.querySelectorAll(".status-edit, .payment-edit").forEach((row) => {
+        document.querySelectorAll(".status-edit, .payment-edit, .item-edit").forEach((row) => {
             row.classList.add("d-none");
+            document.querySelectorAll(".status-display, .payment-display, .item-display").forEach((disp) => {
+                disp.classList.remove("d-none");
+            });
         });
 
         if (type === 'status') {
@@ -62,63 +81,69 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'payment') {
             document.getElementById(`paymentDisplay-${id}`).classList.add("d-none");
             document.getElementById(`paymentEdit-${id}`).classList.remove("d-none");
+        }else if (type === 'itemStatus') {
+            document.getElementById(`itemDisplay-${id}`).classList.add("d-none");
+            document.getElementById(`itemEdit-${id}`).classList.remove("d-none");
         }
     });
     
+
     //  Inline status and payment edit: cancel
     document.addEventListener("click", (e) => {
-        const cancelBtn = e.target.closest(".cancelPaymentBtn, .cancelStatusBtn");
+        const cancelBtn = e.target.closest(".cancelPaymentBtn, .cancelStatusBtn, .cancelItemStatusBtn");
         if (!cancelBtn) return;
 
         const id = cancelBtn.dataset.id;
-        const type = cancelBtn.dataset.type; // 'status' or 'payment'
+        const type = cancelBtn.dataset.type; // 'status', 'payment', or 'itemStatus'
         if (type === 'payment') {
             document.getElementById(`paymentEdit-${id}`).classList.add("d-none");
             document.getElementById(`paymentDisplay-${id}`).classList.remove("d-none");
         } else if (type === 'status') {
             document.getElementById(`statusEdit-${id}`).classList.add("d-none");
             document.getElementById(`statusDisplay-${id}`).classList.remove("d-none");
+        } else if (type === 'itemStatus') {
+            document.getElementById(`itemEdit-${id}`).classList.add("d-none");
+            document.getElementById(`itemDisplay-${id}`).classList.remove("d-none");
         }
     });
   
-    //  Inline status and payment edit: save changes
+
+    //  Inline order status, payment status and menu item status edit: save changes
     document.addEventListener("click", async (e) => {
-        const saveBtn = e.target.closest(".saveStatusBtn, .savePaymentBtn");
+        const saveBtn = e.target.closest(".saveStatusBtn, .savePaymentBtn, .saveItemStatusBtn");
         if (!saveBtn) return;
 
         const id = saveBtn.dataset.id;
-        const type = saveBtn.dataset.type; // 'status' or 'payment'
+        const type = saveBtn.dataset.type; // 'status', 'payment' or 'itemStatus'
         let newValue;
         let payload = { 
-            order_id: id,
+            id: id,
             type: type
         };
-
-        const formData = new FormData();
-        formData.append('order_id', id);
-        formData.append('type', type);
 
 
         if (type === 'status') {
             newValue = document.getElementById(`statusSelect-${id}`).value;
             payload.status = newValue;
-            formData.append('status', newValue);
         } else if (type === 'payment') {
             newValue = document.getElementById(`paymentSelect-${id}`).value;
             payload.payment_status = newValue;
-            formData.append('payment_status', newValue);
+        } else if (type === 'itemStatus') {
+            newValue = document.getElementById(`itemStatusSelect-${id}`).value;
+            payload.item_status = newValue;
         }
-
+    
         try {
-            const response = await fetch('../../processes/admin-processes/update_order.php', {
+            const response = await fetch('../../processes/admin-processes/update_status.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: formData,
+                body: JSON.stringify(payload),
             });
-            const data = await response.json();
 
+            const data = await response.json();
+   
             if (data.status === 'success') {
                 if (type === 'status') {
                      // Update display badge
@@ -126,11 +151,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     const edit = document.getElementById(`statusEdit-${id}`);
                     const badge = display.querySelector(".status-badge");
 
-                    badge.className = "badge";
+                    badge.className = "badge status-badge";
                     if (newValue === "completed" || newValue === "ready") badge.classList.add("bg-success");
                     else if (newValue === "cancelled") badge.classList.add("bg-danger");
                     else if (newValue === "pending" || newValue === "preparing") badge.classList.add("bg-secondary");
-                    else badge.classList.add("bg-warning text-dark");
+                    else if (newValue === "confirmed"){badge.classList.add("bg-warning"); badge.classList.add("text-dark");};
 
                     badge.textContent = newValue;
 
@@ -138,34 +163,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     display.classList.remove("d-none");
                     showToast(data.message, true);
 
-                    // If status changed to completed or cancelled, disable payment edit
-                    if (newValue === "completed" || newValue === "cancelled") {
-                        const paymentEditBtn = document.querySelector(`.editPaymentBtn[data-id='${id}']`);
-                        if (paymentEditBtn) {
-                            paymentEditBtn.classList.add("disabled");
-                            paymentEditBtn.setAttribute("title", "Cannot edit payment status for completed or cancelled orders");
-                        }
-                    }
-
-                    // If status changed from completed or cancelled to something else, enable payment edit
-                    else {
-                        const paymentEditBtn = document.querySelector(`.editPaymentBtn[data-id='${id}']`);
-                        if (paymentEditBtn) {
-                            paymentEditBtn.classList.remove("disabled");
-                            paymentEditBtn.removeAttribute("title");
-                        }
-                    }
-
                 } else if (type === 'payment') {
                     // Update display badge
                     const display = document.getElementById(`paymentDisplay-${id}`);
                     const edit = document.getElementById(`paymentEdit-${id}`);
                     const badge = display.querySelector(".payment-badge");
 
-                    badge.className = "badge";
+                    badge.className = "badge payment-badge";
                     if (newValue === "paid") badge.classList.add("bg-success");
-                    else if (newValue === "unpaid") badge.classList.add("bg-danger");
-                    else badge.classList.add("bg-warning text-dark");
+                    else if (newValue === "failed") badge.classList.add("bg-danger");
+                    else if (newValue === "refunded") badge.classList.add("bg-secondary");
+                    else if (newValue === "pending") {badge.classList.add("bg-warning"); badge.classList.add("text-dark");};
+
+                    badge.textContent = newValue;
+
+                    edit.classList.add("d-none");
+                    display.classList.remove("d-none");
+                    showToast(data.message, true);
+                } else if (type === 'itemStatus') {
+                    // Update display badge
+                    const display = document.getElementById(`itemDisplay-${id}`);
+                    const edit = document.getElementById(`itemEdit-${id}`);
+                    const badge = display.querySelector(".item-badge");
+
+                    badge.className = "badge item-badge";
+                    if (newValue === "active") badge.classList.add("bg-success");
+                    else if (newValue === "inactive") badge.classList.add("bg-secondary");
 
                     badge.textContent = newValue;
 
@@ -182,58 +205,77 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle search filter for orders
-    const orderFilter = document.getElementById('orderFilter');
-    if (orderFilter) {
-        orderFilter.addEventListener('keyup', function () {
+
+    // Handle search filter
+    const filters = document.querySelectorAll('#orderFilter, #menuFilter');
+    if (!filters) return;
+    filters.forEach(filter => {
+        filter.addEventListener('keyup', function () {
             const query = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#ordersTable tr');
+            const tableId = this.id === 'orderFilter' ? 'ordersTable' : 'menuItemsTable';
+            const rows = document.querySelectorAll(`#${tableId} tr`);
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(query) ? '' : 'none';
             });
         });
-    }
+    });
 
-    // Handle delete order
+
+    // Handle delete order and delete menu item
+    let deleteTarget = { id: null, action: null };
+
     document.addEventListener("click", async (e) => {
-        const deleteBtn = e.target.closest(".deleteOrderBtn");
+        const deleteBtn = e.target.closest(".deleteOrderBtn, .deleteItemBtn");
         if (!deleteBtn) return;
 
         const id = deleteBtn.dataset.id;
+        const action = deleteBtn.dataset.action; // 'delete_order' or 'delete_menu'
 
-        const toast = new bootstrap.Toast(document.getElementById('deleteOrderToast'));
-        toast.show();
+        deleteTarget.id = id;
+        deleteTarget.action = action;
 
-        const deleteForm = document.getElementById('deleteOrderForm');
-        if (!deleteForm) return;
-        
-        deleteForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            
-            try {
-                const response = await fetch('../../processes/admin-processes/delete_order.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ order_id: id }),
-                });
-                const data = await response.json();
+        if (action === 'delete_order') {
+            showDeleteToast('<p>Are you sure you want to delete this order?</p><br><p>This action cannot be undone.</p>');
+        }
+
+        if (action === 'delete_menu') {
+            showDeleteToast('<p>Are you sure you want to delete this menu item?</p><br><p>This action cannot be undone.</p>');
+        }
+    });
+
+    // Confirm delete
+    const confirmDelete = document.getElementById("deleteForm");
+    if (!confirmDelete) return;
+    confirmDelete.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!deleteTarget.id || !deleteTarget.action) return;
+
+        const payload = {
+            action: deleteTarget.action,
+        };
     
-                if (data.status === 'success') {
-                    // Remove the order row from the table
-                    const row = document.getElementById(`order-${id}`);
-                    const itemsRow = document.getElementById(`item-${id}`);
-                    if (row) {
-                        row.remove();
-                    }
-                    if (itemsRow) {
-                        itemsRow.remove();
-                    }
-                    showToast(data.message, true);
-                    toast.hide();
-                    
+        if (deleteTarget.action === 'delete_order') {
+            payload.order_id = deleteTarget.id;
+        } else if (deleteTarget.action === 'delete_menu') {
+            payload.item_id = deleteTarget.id;
+        }
+
+        try {
+            const response = await fetch('../../processes/admin-processes/process_delete.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+    
+            const data = await response.json();
+    
+            if (data.status === 'success') {
+                if (deleteTarget.action === 'delete_order') {
+                    document.getElementById(`order-${deleteTarget.id}`)?.remove();
+                    document.getElementById(`item-${deleteTarget.id}`)?.remove();
+
                     // update order count
                     const orderCountEl = document.getElementById('orderCount');
                     if (orderCountEl) {
@@ -241,16 +283,37 @@ document.addEventListener('DOMContentLoaded', function() {
                         count = isNaN(count) ? 0 : count - 1;
                         orderCountEl.textContent = count;
                     }
-                } else {
-                    showToast(data.message, false);
-                    toast.hide();
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('An error occurred while deleting the order.', false); 
-                toast.hide();
+    
+                if (deleteTarget.action === 'delete_menu') {
+                    document.getElementById(`menu-${deleteTarget.id}`)?.remove();
+
+                    // update menu count
+                    const menuCountEl = document.getElementById('menuCount');
+                    if (menuCountEl) {
+                        let count = parseInt(menuCountEl.textContent);
+                        count = isNaN(count) ? 0 : count - 1;
+                        menuCountEl.textContent = count;
+                    }
+                }
+    
+                showToast(data.message, true);
+            } else {
+                showToast(data.message, false);
             }
-        });
-        
+    
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('An error occurred while deleting.', false);
+        }
+
+        const deleteToastEl = document.getElementById("deleteToast");
+        const toastInstance = bootstrap.Toast.getInstance(deleteToastEl);
+        if (toastInstance) toastInstance.hide();
+    
+        // Clear target
+        deleteTarget = { id: null, action: null };
     });
+       
+
 });

@@ -23,6 +23,7 @@ include('../../includes/sidebar.php');
         // Fetch summary data
         $totalOrders = $conn->query("SELECT COUNT(*) as count FROM orders")->fetch_assoc()['count'];
 
+        // Fetch all orders
         $sql = "SELECT * FROM orders ORDER BY order_date DESC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -158,9 +159,9 @@ include('../../includes/sidebar.php');
                         <div class="payment-display" id="paymentDisplay-<?=$order['order_id']?>">
                             <span class="badge payment-badge
                                 <?php if($order['payment_status'] === 'paid'):?>bg-success<?php endif; ?>
-                                <?php if($order['payment_status'] === 'pending'):?> bg-warning text-dark<?php endif; ?>
+                                <?php if($order['payment_status'] === 'refunded'):?> bg-warning text-dark<?php endif; ?>
                                 <?php if($order['payment_status'] === 'failed'):?>bg-danger<?php endif; ?>
-                                <?php if($order['payment_status'] === 'refunded'):?>bg-secondary<?php endif; ?>
+                                <?php if($order['payment_status'] === 'pending'):?>bg-secondary<?php endif; ?>
                                 ">
                             <?=$order['payment_status']?>
                             </span> <br>
@@ -176,7 +177,7 @@ include('../../includes/sidebar.php');
                                 <option value="pending" <?php if($order['payment_status'] === 'pending'):?>selected<?php endif; ?>>Pending</option>
                                 <option value="refunded" <?php if($order['payment_status'] === 'refunded'):?>selected<?php endif; ?>>Refunded</option>
                             </select>
-                            <button class="btn btn-sm btn-success me-1 savePaymentBtn" data-id="<?=$order['order_id']?>">
+                            <button class="btn btn-sm btn-success me-1 savePaymentBtn" data-id="<?=$order['order_id']?>" data-type="payment">
                                 <i class="bi bi-check2"></i>
                             </button>
                             <button class="btn btn-sm btn-outline-success cancelPaymentBtn" data-id="<?=$order['order_id']?>" data-type="payment" >
@@ -191,7 +192,7 @@ include('../../includes/sidebar.php');
 
                     <td>
                         <!-- Order Status Display mode -->
-                        <div class="status-display" id="statusDisplay-<?=$order['order_id']?>"></div>
+                        <div class="status-display" id="statusDisplay-<?=$order['order_id']?>">
                             <span class="badge status-badge
                                 <?php if($order['status'] === 'ready' || $order['status'] === 'completed'):?>bg-success<?php endif; ?>
                                 <?php if($order['status'] === 'confirmed'):?> bg-warning text-dark<?php endif; ?>
@@ -214,7 +215,7 @@ include('../../includes/sidebar.php');
                                 <option value="ready" <?php if($order['status'] === 'ready'):?>selected<?php endif; ?>>Ready</option>
                                 <option value="completed" <?php if($order['status'] === 'completed'):?>selected<?php endif; ?>>Completed</option>
                             </select>
-                            <button class="btn btn-sm btn-success me-1 saveStatusBtn" data-id="<?=$order['order_id']?>">
+                            <button class="btn btn-sm btn-success me-1 saveStatusBtn" data-id="<?=$order['order_id']?>" data-type="status">
                                 <i class="bi bi-check2"></i>
                             </button>
                             <button class="btn btn-sm btn-outline-success cancelStatusBtn" data-id="<?=$order['order_id']?>" data-type="status" >
@@ -224,7 +225,7 @@ include('../../includes/sidebar.php');
 
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-outline-danger deleteOrderBtn" data-id="<?=$order['order_id']?>" title="Delete Order">
+                        <button class="btn btn-sm btn-outline-danger deleteOrderBtn" data-id="<?=$order['order_id']?>" data-action="delete_order" title="Delete Order">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
@@ -286,16 +287,6 @@ include('../../includes/sidebar.php');
     <?php $conn->close(); ?>
     
 </main>
-
-<!-- confirmation toast -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-  <div id="toast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastBody"></div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-    </div>
-  </div>
-</div>
 
 <!-- delete toast -->
 <div aria-live="polite" aria-atomic="true" class="position-fixed top-50 start-50 translate-middle">

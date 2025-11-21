@@ -8,13 +8,14 @@
 
         $data = json_decode($raw, true);
 
-        $orderId = $_POST['order_id'];
-        $status = $_POST['status'];
-        $paymentStatus = $_POST['payment_status'] ;
-        $type = $_POST['type'];
+        $id = $data['id'];
+        $status = $data['status'];
+        $paymentStatus = $data['payment_status'] ;
+        $itemStatus = $data['item_status'];
+        $type = $data['type'];
 
         // Validate inputs
-        if (empty($orderId) || empty($type)) {
+        if (empty($id) || empty($type)) {
             echo json_encode(['status' => 'error', 'message' => 'Order ID and type are required.']);
             exit();
         }
@@ -28,7 +29,7 @@
             // Update payment status in the database
             $updatePaymentQuery = "UPDATE payments SET payment_status = ? WHERE order_id = ?";
             $stmtPayment = $conn->prepare($updatePaymentQuery);
-            $stmtPayment->bind_param("si", $paymentStatus, $orderId);
+            $stmtPayment->bind_param("si", $paymentStatus, $id);
 
             if ($stmtPayment->execute()) {
                 echo json_encode(['status' => 'success', 'message' => 'Payment status updated successfully.']);
@@ -47,7 +48,7 @@
             // Update order status in the database
             $updateQuery = "UPDATE orders SET status = ? WHERE order_id = ?";
             $stmt = $conn->prepare($updateQuery);
-            $stmt->bind_param("si", $status, $orderId);
+            $stmt->bind_param("si", $status, $id);
 
             if ($stmt->execute()) {
                 echo json_encode(['status' => 'success', 'message' => 'Order updated successfully.']);
@@ -55,6 +56,25 @@
                 echo json_encode(['status' => 'error', 'message' => 'Failed to update order. Please try again later.']);
             }
             $stmt->close();
+            $conn->close();
+            exit();
+        } else if  ($type === 'itemStatus') {
+            if (empty($itemStatus)) {
+                echo json_encode(['status' => 'error', 'message' => 'Item status is required.']);
+                exit();
+            }
+            // Update item status in the database
+            $updateItemQuery = "UPDATE menu_items SET status = ? WHERE item_id = ?";
+            $stmtItem = $conn->prepare($updateItemQuery);
+            $stmtItem->bind_param("si", $itemStatus, $id);
+
+            if ($stmtItem->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'Item status updated successfully.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to update item status. Please try again later.']);
+            }
+
+            $stmtItem->close();
             $conn->close();
             exit();
         } else {
