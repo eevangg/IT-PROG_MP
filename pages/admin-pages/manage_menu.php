@@ -1,7 +1,7 @@
 <?php
-session_start();
-$pageTitle = "Menu Management - ArcherInnov Canteen Pre-order System";
-include('../../includes/sidebar.php'); 
+    session_start();
+    $pageTitle = "Menu Management - ArcherInnov Canteen Pre-order System";
+    include('../../includes/sidebar.php'); 
 ?>
 
 <main class="admin-content container my-5 fullHeight d-flex flex-column align-items-center justify-content-start">
@@ -38,6 +38,7 @@ include('../../includes/sidebar.php');
                 $menuItems[] = $row;
             }
         }
+        $conn->close();
     ?>
 
     <!-- Summary Cards -->
@@ -83,7 +84,7 @@ include('../../includes/sidebar.php');
     </div>
     <br>
 
-    <p class="text-muted text-center">This section allows you to view and all Menu Items.</p>
+    <p class="text-muted text-center">This section allows you to view and manage all Menu Items.</p>
 
     <!-- Menu Management Table -->
     <?php if(count($menuItems) > 0): ?>

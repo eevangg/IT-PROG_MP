@@ -54,12 +54,12 @@ if (isset($_SESSION['username']) && !isset($_SESSION['is_admin'])) {
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="#" class="nav-link text-white<?php if ($pageTitle === 'Meal Plans - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>?>">
+            <a href="manage_meal_plans.php" class="nav-link text-white<?php if ($pageTitle === 'Meal Plans - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>?>">
               <i class="bi bi-journal-bookmark me-2"></i> Meal Plans
             </a>
           </li>
             <li class="nav-item mb-2">
-                <a href="#" class="nav-link text-white <?php if ($pageTitle === 'User Management - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>">
+                <a href="manage_users.php" class="nav-link text-white <?php if ($pageTitle === 'User Management - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>">
                 <i class="bi bi-people me-2"></i> User Management
                 </a>
             </li>

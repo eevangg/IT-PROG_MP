@@ -21,7 +21,7 @@ include('../includes/header.php');
     <?php
       include ("../config/db.php");
       
-      $menuQuery = "SELECT * FROM menu_items WHERE stock > 0";
+      $menuQuery = "SELECT * FROM menu_items WHERE stock > 0 AND status = 'active' ORDER BY item_name ASC";
       $menuResult = $conn->query($menuQuery);
       $menu = [];
       while ($row = $menuResult->fetch_assoc()) {

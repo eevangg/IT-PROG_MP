@@ -41,7 +41,7 @@
                 }
             ?>
             <form class="needs-validation" id="editMenuForm" method="POST" enctype="multipart/form-data" novalidate>
-                <input type="hidden" name="item_id" value="<?php echo htmlspecialchars($menuItem['id']); ?>">
+                <input type="hidden" name="item_id" value="<?php echo htmlspecialchars($menuItem['item_id']); ?>">
                 <div class="mb-3">
                     <label for="item_name" class="form-label">Item Name</label>
                     <input type="text" class="form-control" id="item_name" name="item_name" value="<?php echo htmlspecialchars($menuItem['item_name']); ?>" required minlength="2">
