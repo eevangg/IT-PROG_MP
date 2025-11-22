@@ -208,18 +208,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle search filter
     const filters = document.querySelectorAll('#orderFilter, #menuFilter');
-    if (!filters) return;
-    filters.forEach(filter => {
-        filter.addEventListener('keyup', function () {
-            const query = this.value.toLowerCase();
-            const tableId = this.id === 'orderFilter' ? 'ordersTable' : 'menuItemsTable';
-            const rows = document.querySelectorAll(`#${tableId} tr`);
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(query) ? '' : 'none';
+    if (filters.length > 0) {
+        filters.forEach(filter => {
+            filter.addEventListener('keyup', function () {
+                const query = this.value.toLowerCase();
+                const tableId = this.id === 'orderFilter' ? 'ordersTable' : 'menuItemsTable';
+                const rows = document.querySelectorAll(`#${tableId} tr`);
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
+                });
             });
         });
-    });
+    }
 
 
     // Handle delete order and delete menu item
@@ -236,84 +237,165 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteTarget.action = action;
 
         if (action === 'delete_order') {
-            showDeleteToast('<p>Are you sure you want to delete this order?</p><br><p>This action cannot be undone.</p>');
+            showDeleteToast('<p>Are you sure you want to delete this order?</p><p>This action cannot be undone.</p>');
         }
 
         if (action === 'delete_menu') {
-            showDeleteToast('<p>Are you sure you want to delete this menu item?</p><br><p>This action cannot be undone.</p>');
+            showDeleteToast('<p>Are you sure you want to delete this menu item?</p><p>This action cannot be undone.</p>');
         }
     });
 
     // Confirm delete
     const confirmDelete = document.getElementById("deleteForm");
-    if (!confirmDelete) return;
-    confirmDelete.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    if (confirmDelete) {
+        confirmDelete.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        if (!deleteTarget.id || !deleteTarget.action) return;
+            if (!deleteTarget.id || !deleteTarget.action) return;
 
-        const payload = {
-            action: deleteTarget.action,
-        };
-    
-        if (deleteTarget.action === 'delete_order') {
-            payload.order_id = deleteTarget.id;
-        } else if (deleteTarget.action === 'delete_menu') {
-            payload.item_id = deleteTarget.id;
-        }
-
-        try {
-            const response = await fetch('../../processes/admin-processes/process_delete.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-    
-            const data = await response.json();
-    
-            if (data.status === 'success') {
-                if (deleteTarget.action === 'delete_order') {
-                    document.getElementById(`order-${deleteTarget.id}`)?.remove();
-                    document.getElementById(`item-${deleteTarget.id}`)?.remove();
-
-                    // update order count
-                    const orderCountEl = document.getElementById('orderCount');
-                    if (orderCountEl) {
-                        let count = parseInt(orderCountEl.textContent);
-                        count = isNaN(count) ? 0 : count - 1;
-                        orderCountEl.textContent = count;
-                    }
-                }
-    
-                if (deleteTarget.action === 'delete_menu') {
-                    document.getElementById(`menu-${deleteTarget.id}`)?.remove();
-
-                    // update menu count
-                    const menuCountEl = document.getElementById('menuCount');
-                    if (menuCountEl) {
-                        let count = parseInt(menuCountEl.textContent);
-                        count = isNaN(count) ? 0 : count - 1;
-                        menuCountEl.textContent = count;
-                    }
-                }
-    
-                showToast(data.message, true);
-            } else {
-                showToast(data.message, false);
+            const payload = {
+                action: deleteTarget.action,
+            };
+        
+            if (deleteTarget.action === 'delete_order') {
+                payload.order_id = deleteTarget.id;
+            } else if (deleteTarget.action === 'delete_menu') {
+                payload.item_id = deleteTarget.id;
             }
-    
-        } catch (error) {
-            console.error('Error:', error);
-            showToast('An error occurred while deleting.', false);
-        }
 
-        const deleteToastEl = document.getElementById("deleteToast");
-        const toastInstance = bootstrap.Toast.getInstance(deleteToastEl);
-        if (toastInstance) toastInstance.hide();
-    
-        // Clear target
-        deleteTarget = { id: null, action: null };
-    });
+            try {
+                const response = await fetch('../../processes/admin-processes/process_delete.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+        
+                const data = await response.json();
+        
+                if (data.status === 'success') {
+                    if (deleteTarget.action === 'delete_order') {
+                        document.getElementById(`order-${deleteTarget.id}`)?.remove();
+                        document.getElementById(`item-${deleteTarget.id}`)?.remove();
+
+                        // update order count
+                        const orderCountEl = document.getElementById('orderCount');
+                        if (orderCountEl) {
+                            let count = parseInt(orderCountEl.textContent);
+                            count = isNaN(count) ? 0 : count - 1;
+                            orderCountEl.textContent = count;
+                        }
+                    }
+        
+                    if (deleteTarget.action === 'delete_menu') {
+                        document.getElementById(`menu-${deleteTarget.id}`)?.remove();
+
+                        // update menu count
+                        const menuCountEl = document.getElementById('menuCount');
+                        if (menuCountEl) {
+                            let count = parseInt(menuCountEl.textContent);
+                            count = isNaN(count) ? 0 : count - 1;
+                            menuCountEl.textContent = count;
+                        }
+                    }
+        
+                    showToast(data.message, true);
+                } else {
+                    showToast(data.message, false);
+                }
+        
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while deleting.', false);
+            }
+
+            const deleteToastEl = document.getElementById("deleteToast");
+            const toastInstance = bootstrap.Toast.getInstance(deleteToastEl);
+            if (toastInstance) toastInstance.hide();
+        
+            // Clear target
+            deleteTarget = { id: null, action: null };
+        });
+    }
        
 
+
+    // Handle create menu item form submission
+    menuForm = document.getElementById("createMenuForm");
+    if (menuForm) {
+        menuForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            // validate form inputs
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData(menuForm);
+
+            try {
+                const response = await fetch('../../processes/admin-processes/process_create_menu.php', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    menuForm.reset();
+                    showToast(data.message, true);
+
+                } else {
+                    showToast(data.message, false);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while creating the menu item.', false);
+            }
+        });
+    }
+
+
+    // Handle edit menu item form submission
+    const editMenuForm = document.getElementById("editMenuForm");
+    if (editMenuForm) { 
+        editMenuForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            // validate form inputs
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData(editMenuForm);
+
+            try {
+                const response = await fetch('../../processes/admin-processes/process_edit_menu.php', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    showToast(data.message, true);
+                    setTimeout(() => {
+                        window.location.href = "manage_menu.php";
+                    }, 1000);
+                } else {
+                    showToast(data.message, false);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while editing the menu item.', false);
+            }
+        });
+    }
 });

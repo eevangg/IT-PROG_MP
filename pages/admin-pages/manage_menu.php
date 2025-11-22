@@ -139,7 +139,7 @@ include('../../includes/sidebar.php');
                                 </div>
                             </td>
                             <td class="text-end">
-                                <a href="edit_menu_item.php" class="btn btn-sm btn-outline-success me-1" title="Edit Item">
+                                <a href="edit_menu_item.php?id=<?=$menuItem['item_id']?>" class="btn btn-sm btn-outline-success me-1" data-id="<?=$menuItem['item_id']?>" title="Edit Item">
                                     <i class="bi bi-pencil"> Edit Item</i>
                                 </a>
                                 <button class="btn btn-sm btn-outline-danger deleteItemBtn" data-id="<?=$menuItem['item_id']?>" data-action="delete_menu" title="Delete Menu Item">

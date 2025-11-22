@@ -80,7 +80,14 @@ h3, h2, h5 {
 .col-md-3 {
     margin: 20px 0;
 }
-.memu-cards:hover {
+.menu-cards:hover {
     transform: scale(1.05);
     transition: transform 0.3s ease;
+}
+.card img {
+    height: 200px;
+}
+.card p {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: smaller;
 }

@@ -288,22 +288,5 @@ include('../../includes/sidebar.php');
     
 </main>
 
-<!-- delete toast -->
-<div aria-live="polite" aria-atomic="true" class="position-fixed top-50 start-50 translate-middle">
-    <div id="deleteOrderToast" class="toast background-white" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-body">
-            <form id="deleteOrderForm" method="post">
-                <p>Are you sure you want to delete this order?</p>
-                <p>This action cannot be undone!</p>
-
-                <div id="delete_message"></div>
-                <div class="mt-2 pt-2 border-top">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
-                    <button id="deleteToastBtn" type="submit" class="btn btn-danger btn-sm float-end">Confirm</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <?php include ('../../includes/closing.php');

@@ -6,7 +6,9 @@ if (session_status() === PHP_SESSION_NONE) {
 if (!isset($_SESSION['username'])) {
     header("Location: ../pages/login.php");
     exit();
-}else if (isset($_SESSION['username']) && !isset($_SESSION['is_admin'])) {
+}
+
+if (isset($_SESSION['username']) && !isset($_SESSION['is_admin'])) {
     header("Location: ../pages/error_pages/access_denied.php");
     exit();
 }

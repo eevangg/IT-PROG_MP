@@ -43,6 +43,7 @@
         }else if ($type === 'status') {
             if (empty($status)) {
                 echo json_encode(['status' => 'error', 'message' => 'Order status is required.']);
+                $conn->close();
                 exit();
             }
             // Update order status in the database
@@ -61,6 +62,7 @@
         } else if  ($type === 'itemStatus') {
             if (empty($itemStatus)) {
                 echo json_encode(['status' => 'error', 'message' => 'Item status is required.']);
+                $conn->close();
                 exit();
             }
             // Update item status in the database
@@ -79,11 +81,13 @@
             exit();
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Invalid update type.']);
+            $conn->close();
             exit();
         }
         
     } else {
-        header("Location: ../pages/manage_orders.php");
+        echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
+        $conn->close();
         exit();
     }
 ?>

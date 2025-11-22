@@ -27,12 +27,12 @@ include('../includes/header.php');
       while ($row = $menuResult->fetch_assoc()) {
           $menu[] = $row;
       }
-    
+
       echo '<div class="row g-2">';
      foreach ($menu as $item): ?> 
           <div class="col-md-3">
             <div class="card menu-cards d-flex flex-column h-100">
-              <img src="" class="card-img-top" alt="">
+              <img src="../assets/images/menu_items/<?= $item['image']?>" class="card-img-top" alt="">
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title"><?= $item['item_name'] ?></h5>
                 <p class="card-subtitle mb-2 text-body-secondary"><?= $item['category']?></p>

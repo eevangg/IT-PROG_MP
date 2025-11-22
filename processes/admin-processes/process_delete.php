@@ -38,6 +38,7 @@
         } else if ($action === 'delete_menu') {
             if (empty($itemId)) {
                 echo json_encode(['status' => 'error', 'message' => 'Menu Item ID is required.']);
+                $conn->close();
                 exit();
             }
 
@@ -57,12 +58,14 @@
 
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Invalid action specified.']);
+            $conn->close();
             exit();
         }
 
        
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
+        $conn->close();
         exit();
     }
 

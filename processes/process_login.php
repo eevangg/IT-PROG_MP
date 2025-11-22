@@ -60,7 +60,6 @@
             }
         } else {
             echo json_encode(['error' => "Username not found!"]);
-            //header("Location: login.php");
             $stmt->close();
             $conn->close();
             exit;

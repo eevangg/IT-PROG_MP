@@ -51,7 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->close();
     exit();
 } else {
-    header("Location: ../pages/profile.php");
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
+    $conn->close();
     exit();
 }
 ?>

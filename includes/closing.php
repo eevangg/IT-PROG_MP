@@ -12,7 +12,7 @@
         <div aria-live="polite" aria-atomic="true" class="position-fixed top-50 start-50 translate-middle" style="z-index: 11">
             <div id="deleteToast" class="toast background-white" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-body">
-                    <div id="deleteToastAlert"></div>
+                    <div id="deleteToastAlert" class="text-center"></div>
                     <form id="deleteForm" method="post">
                         <div id="delete_message"></div>
                         <div class="mt-2 pt-2 border-top">
