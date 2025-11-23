@@ -59,18 +59,19 @@ document.addEventListener('DOMContentLoaded', function() {
  
 
 
-   //  Inline order status, payment status and menu item status edit: enter edit mode
+   //  Inline order status, payment status, meal plans status, and menu item status edit: enter edit mode
     document.addEventListener("click", (e) => {
-        const editBtn = e.target.closest(".editStatusBtn, .editPaymentBtn, .editItemStatusBtn");
+        const editBtn = e.target.closest(".editStatusBtn, .editPaymentBtn, .editItemStatusBtn, .editPlanStatusBtn");
         if (!editBtn) return;   
 
         const id = editBtn.dataset.id;
-        const type = editBtn.dataset.type; // 'status', 'payment' or 'itemStatus'
+        const type = editBtn.dataset.type; // 'status', 'payment',  'itemStatus' or 'planStatus'
 
         // close all other edit modes
-        document.querySelectorAll(".status-edit, .payment-edit, .item-edit").forEach((row) => {
+        document.querySelectorAll(".status-edit, .payment-edit, .item-edit, .plan-edit").forEach((row) => {
             row.classList.add("d-none");
-            document.querySelectorAll(".status-display, .payment-display, .item-display").forEach((disp) => {
+            // show all display modes
+            document.querySelectorAll(".status-display, .payment-display, .item-display, .plan-display").forEach((disp) => {
                 disp.classList.remove("d-none");
             });
         });
@@ -84,17 +85,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }else if (type === 'itemStatus') {
             document.getElementById(`itemDisplay-${id}`).classList.add("d-none");
             document.getElementById(`itemEdit-${id}`).classList.remove("d-none");
+        } else if (type === 'planStatus') {
+            document.getElementById(`planDisplay-${id}`).classList.add("d-none");
+            document.getElementById(`planEdit-${id}`).classList.remove("d-none");
         }
     });
     
 
-    //  Inline status and payment edit: cancel
+    // Inline order status, payment status, meal plans status, and menu item status edit: cancel
     document.addEventListener("click", (e) => {
-        const cancelBtn = e.target.closest(".cancelPaymentBtn, .cancelStatusBtn, .cancelItemStatusBtn");
+        const cancelBtn = e.target.closest(".cancelPaymentBtn, .cancelStatusBtn, .cancelItemStatusBtn, .cancelPlanStatusBtn");
         if (!cancelBtn) return;
 
         const id = cancelBtn.dataset.id;
-        const type = cancelBtn.dataset.type; // 'status', 'payment', or 'itemStatus'
+        const type = cancelBtn.dataset.type; // 'status', 'payment', 'itemStatus' or 'planStatus'
         if (type === 'payment') {
             document.getElementById(`paymentEdit-${id}`).classList.add("d-none");
             document.getElementById(`paymentDisplay-${id}`).classList.remove("d-none");
@@ -104,17 +108,20 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'itemStatus') {
             document.getElementById(`itemEdit-${id}`).classList.add("d-none");
             document.getElementById(`itemDisplay-${id}`).classList.remove("d-none");
-        }
+        } else if (type === 'planStatus') {
+            document.getElementById(`planEdit-${id}`).classList.add("d-none");
+            document.getElementById(`planDisplay-${id}`).classList.remove("d-none");
+        }   
     });
   
 
-    //  Inline order status, payment status and menu item status edit: save changes
+    //  Inline order status, payment status, meal plan status, and menu item status edit: save changes
     document.addEventListener("click", async (e) => {
-        const saveBtn = e.target.closest(".saveStatusBtn, .savePaymentBtn, .saveItemStatusBtn");
+        const saveBtn = e.target.closest(".saveStatusBtn, .savePaymentBtn, .saveItemStatusBtn, .savePlanStatusBtn");
         if (!saveBtn) return;
 
         const id = saveBtn.dataset.id;
-        const type = saveBtn.dataset.type; // 'status', 'payment' or 'itemStatus'
+        const type = saveBtn.dataset.type; // 'status', 'payment', 'itemStatus' or 'planStatus'
         let newValue;
         let payload = { 
             id: id,
@@ -131,6 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'itemStatus') {
             newValue = document.getElementById(`itemStatusSelect-${id}`).value;
             payload.item_status = newValue;
+        } else if (type === 'planStatus') {
+            newValue = document.getElementById(`planStatusSelect-${id}`).value;
+            payload.plan_status = newValue;
         }
     
         try {
@@ -195,24 +205,46 @@ document.addEventListener('DOMContentLoaded', function() {
                     edit.classList.add("d-none");
                     display.classList.remove("d-none");
                     showToast(data.message, true);
+                } else if (type === 'planStatus') {
+                    // Update display badge
+                    const display = document.getElementById(`planDisplay-${id}`);
+                    const edit = document.getElementById(`planEdit-${id}`);
+                    const badge = display.querySelector(".plan-badge");
+
+                    badge.className = "badge plan-badge";
+                    if (newValue === "available") badge.classList.add("bg-success");
+                    else if (newValue === "unavailable") badge.classList.add("bg-secondary");
+
+                    badge.textContent = newValue;
+
+                    edit.classList.add("d-none");
+                    display.classList.remove("d-none");
+                    showToast(data.message, true);
                 }
             } else {
                 showToast(data.message , false);
             }
         } catch (error) {
             console.error('Error:', error);
-            showToast('An error occurred while updating the order.', false); 
+            showToast('An error occurred while updating status.', false); 
         }
     });
 
 
     // Handle search filter
-    const filters = document.querySelectorAll('#orderFilter, #menuFilter');
+    const filters = document.querySelectorAll('#orderFilter, #menuFilter, #planFilter');
     if (filters.length > 0) {
         filters.forEach(filter => {
             filter.addEventListener('keyup', function () {
                 const query = this.value.toLowerCase();
-                const tableId = this.id === 'orderFilter' ? 'ordersTable' : 'menuItemsTable';
+                let tableId = null;
+            if (this.id === 'orderFilter'){
+                    tableId = 'ordersTable';
+            } else if (this.id === 'menuFilter'){
+                    tableId = 'menuItemsTable';
+            } else {
+                    tableId = 'mealPlansTable';
+            }
                 const rows = document.querySelectorAll(`#${tableId} tr`);
                 rows.forEach(row => {
                     const text = row.textContent.toLowerCase();
@@ -227,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let deleteTarget = { id: null, action: null };
 
     document.addEventListener("click", async (e) => {
-        const deleteBtn = e.target.closest(".deleteOrderBtn, .deleteItemBtn");
+        const deleteBtn = e.target.closest(".deleteOrderBtn, .deleteItemBtn, .deletePlanBtn");
         if (!deleteBtn) return;
 
         const id = deleteBtn.dataset.id;
@@ -242,6 +274,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (action === 'delete_menu') {
             showDeleteToast('<p>Are you sure you want to delete this menu item?</p><p>This action cannot be undone.</p>');
+        }
+
+        if (action === 'delete_plan') {
+            showDeleteToast('<p>Are you sure you want to delete this meal plan?</p><p>This action cannot be undone.</p>');
         }
     });
 
@@ -261,6 +297,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 payload.order_id = deleteTarget.id;
             } else if (deleteTarget.action === 'delete_menu') {
                 payload.item_id = deleteTarget.id;
+            } else if (deleteTarget.action === 'delete_plan') {
+                payload.plan_id = deleteTarget.id;
             }
 
             try {
@@ -295,6 +333,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             let count = parseInt(menuCountEl.textContent);
                             count = isNaN(count) ? 0 : count - 1;
                             menuCountEl.textContent = count;
+                        }
+                    }
+
+                    if (deleteTarget.action === 'delete_plan') {
+                        document.getElementById(`plan-${deleteTarget.id}`)?.remove();
+
+                        // update plan count
+                        const planCountEl = document.getElementById('mealPlanCount');
+                        if (planCountEl) {
+                            let count = parseInt(planCountEl.textContent);
+                            count = isNaN(count) ? 0 : count - 1;
+                            planCountEl.textContent = count;
                         }
                     }
         
@@ -395,6 +445,46 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 console.error('Error:', error);
                 showToast('An error occurred while editing the menu item.', false);
+            }
+        });
+    }
+
+
+    // Handle create meal plan form submission
+    planForm = document.getElementById("createMealPlanForm");
+    if (planForm) {
+        planForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            // validate form inputs
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData(planForm);
+
+            try {
+                const response = await fetch('../../processes/admin-processes/process_create_meal_plan.php', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    planForm.reset();
+                    showToast(data.message, true);
+
+                } else {
+                    showToast(data.message, false);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while creating the meal plan.', false);
             }
         });
     }

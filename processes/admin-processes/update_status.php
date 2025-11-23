@@ -12,6 +12,7 @@
         $status = $data['status'];
         $paymentStatus = $data['payment_status'] ;
         $itemStatus = $data['item_status'];
+        $planStatus = $data['plan_status'];
         $type = $data['type'];
 
         // Validate inputs
@@ -79,7 +80,27 @@
             $stmtItem->close();
             $conn->close();
             exit();
-        } else {
+        } else if ($type === 'planStatus') {
+            if (empty($planStatus)) {
+                echo json_encode(['status' => 'error', 'message' => 'Plan status is required.']);
+                $conn->close();
+                exit();
+            }
+            // Update meal plan status in the database
+            $updatePlanQuery = "UPDATE meal_plans SET status = ? WHERE plan_id = ?";
+            $stmtPlan = $conn->prepare($updatePlanQuery);
+            $stmtPlan->bind_param("si", $planStatus, $id);
+
+            if ($stmtPlan->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'Meal plan status updated successfully.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to update meal plan status. Please try again later.']);
+            }
+
+            $stmtPlan->close();
+            $conn->close();
+            exit();
+        }else {
             echo json_encode(['status' => 'error', 'message' => 'Invalid update type.']);
             $conn->close();
             exit();

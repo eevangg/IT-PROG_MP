@@ -8,6 +8,7 @@
 
         $orderId = intval($data['order_id']);
         $itemId = intval($data['item_id']);
+        $planId = intval($data['plan_id']);
         $action = $data['action'];
 
         if (empty($action)) {
@@ -56,7 +57,29 @@
             $conn->close();
             exit();
 
-        } else {
+        } else if  ($action === 'delete_plan') {
+            if (empty($planId)) {
+                echo json_encode(['status' => 'error', 'message' => 'Meal Plan ID is required.']);
+                $conn->close();
+                exit();
+            }
+
+            // Delete meal plan from the database
+            $deleteQuery = "DELETE FROM meal_plans WHERE plan_id = ?";
+            $stmt = $conn->prepare($deleteQuery);
+            $stmt->bind_param("i", $planId);
+
+            if ($stmt->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'Meal plan deleted successfully.']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to delete meal plan. Please try again later.']);
+            }
+            $stmt->close();
+            $conn->close();
+            exit();
+
+        }   
+        else {
             echo json_encode(['status' => 'error', 'message' => 'Invalid action specified.']);
             $conn->close();
             exit();

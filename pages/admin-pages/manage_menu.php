@@ -141,7 +141,7 @@
                             </td>
                             <td class="text-end">
                                 <a href="edit_menu_item.php?id=<?=$menuItem['item_id']?>" class="btn btn-sm btn-outline-success me-1" data-id="<?=$menuItem['item_id']?>" title="Edit Item">
-                                    <i class="bi bi-pencil"> Edit Item</i>
+                                    <i class="bi bi-pencil-square"></i> Edit Item
                                 </a>
                                 <button class="btn btn-sm btn-outline-danger deleteItemBtn" data-id="<?=$menuItem['item_id']?>" data-action="delete_menu" title="Delete Menu Item">
                                     <i class="bi bi-trash"></i>
