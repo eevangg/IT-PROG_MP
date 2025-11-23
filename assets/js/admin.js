@@ -232,24 +232,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // Handle search filter
-    const filters = document.querySelectorAll('#orderFilter, #menuFilter, #planFilter');
+    const filters = document.querySelectorAll('#orderFilter, #menuFilter, #planFilter, .userFilter');
     if (filters.length > 0) {
         filters.forEach(filter => {
+
             filter.addEventListener('keyup', function () {
                 const query = this.value.toLowerCase();
                 let tableId = null;
-            if (this.id === 'orderFilter'){
-                    tableId = 'ordersTable';
-            } else if (this.id === 'menuFilter'){
-                    tableId = 'menuItemsTable';
-            } else {
-                    tableId = 'mealPlansTable';
-            }
+
+                if (this.id === 'orderFilter'){
+                        tableId = 'ordersTable';
+                } else if (this.id === 'menuFilter'){
+                        tableId = 'menuItemsTable';
+                } else if (this.id === 'planFilter'){
+                        tableId = 'mealPlansTable';
+                } 
+
                 const rows = document.querySelectorAll(`#${tableId} tr`);
+            
                 rows.forEach(row => {
                     const text = row.textContent.toLowerCase();
                     row.style.display = text.includes(query) ? '' : 'none';
                 });
+               
             });
         });
     }
@@ -488,4 +493,48 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+
+    // Handle edit meal plan form submission
+    const editPlanForm = document.getElementById("editMealPlanForm");
+    if (editPlanForm) { 
+        editPlanForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            // validate form inputs
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData(editPlanForm);
+
+            try {
+                const response = await fetch('../../processes/admin-processes/process_edit_meal_plan.php', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    showToast(data.message, true);
+                    setTimeout(() => {
+                        window.location.href = "manage_meal_plans.php";
+                    }, 1000);
+                } else {
+                    showToast(data.message, false);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while editing the meal plan.', false);
+            }
+        });
+    }
+
+
+
 });

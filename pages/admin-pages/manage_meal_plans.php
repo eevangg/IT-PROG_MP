@@ -126,7 +126,7 @@
                                         // retrieve item names for each meal plan
                                         $sql = "SELECT item_name FROM menu_items WHERE item_id = ?";
                                         $stmt = $conn->prepare($sql);
-                                        $stmt->bind_param("i", $plan['plan_id']);
+                                        $stmt->bind_param("i", $plan['item_id']);
                                         $stmt->execute();
                                         $itemResult = $stmt->get_result();
                                         $item = $itemResult->fetch_assoc();

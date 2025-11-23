@@ -24,19 +24,7 @@
             echo "<div class='alert alert-danger'>Invalid request.</div>";
             exit();
         }
-
-        // get menu item name
-        $stmt = $conn->prepare("SELECT item_name FROM menu_items WHERE item_id = ?");
-        $stmt->bind_param("i", $mealPlan['item_id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $item = $result->fetch_assoc();
-            $item = $item['item_name'];
-        } else {
-            $item = "Unknown Item";
-        }
-
+        
         // get the menu items
         $sql = "SELECT item_id, item_name FROM menu_items WHERE status = 'active' ORDER BY item_name ASC";
         $result = $conn->query($sql);
@@ -57,7 +45,7 @@
                 <i class="bi bi-arrow-left me-1"></i> Back
             </a>
         </div>
-        <h1 class="text-center flex-grow-1 fw-bold text-success">Edit <?php echo htmlspecialchars($item); ?></h1>
+        <h1 class="text-center flex-grow-1 fw-bold text-success">Edit Meal Plan</h1>
         <div></div>
     </div>
 
@@ -71,7 +59,7 @@
                     <select class="form-select" id="item_id" name="item_id" required>
                         <option value="" disabled>Select Menu Item</option>
                         <?php foreach ($menuItems as $item): ?>
-                            <option value="<?php echo htmlspecialchars($item['item_id']); ?>" <?php if ($mealPlan['item_id'] == $item['item_id']) echo 'selected'; ?>>
+                            <option value="<?php echo htmlspecialchars($item['item_id']); ?>" <?php if ($item['item_id'] == $mealPlan['item_id']) echo 'selected'; ?>>
                                 <?php echo htmlspecialchars($item['item_name']); ?>
                             </option>
                         <?php endforeach; ?>
