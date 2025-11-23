@@ -88,7 +88,7 @@
                     <div class="text-muted small mb-1">Quick Links</div>
                     <div class="d-flex gap-2 flex-wrap">
                         <a href="dashboard.php" class="btn btn-outline-success btn-sm"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
-                        <a href="manage_meal_plans.php" class="btn btn-outline-success btn-sm"><i class="bi bi-bar-chart-line me-1"></i>View Reports</a>
+                        <a href="reports.php" class="btn btn-outline-success btn-sm"><i class="bi bi-bar-chart-line me-1"></i>View Reports</a>
                     </div>
                 </div>
             </div>

@@ -64,7 +64,7 @@ if (isset($_SESSION['username']) && !isset($_SESSION['is_admin'])) {
                 </a>
             </li>
             <li class="nav-item mb-2">
-                <a href="#" class="nav-link text-white <?php if ($pageTitle === 'Reports - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>">
+                <a href="reports.php" class="nav-link text-white <?php if ($pageTitle === 'Reports - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>">
                 <i class="bi bi-bar-chart-line me-2"></i> Reports
                 </a>
             </li>

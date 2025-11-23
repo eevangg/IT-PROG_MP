@@ -64,7 +64,7 @@
                 <span class="input-group-text bg-success text-white border-success">
                 <i class="bi bi-search"></i>
                 </span>
-                <input type="text" id="menuFilter" class="form-control" placeholder="Search item name, category...">
+                <input type="text" id="menuFilter" class="form-control" placeholder="Search item name, category..." data-table="menuItemsTable">
             </div>
             <div class="form-text">Tip: Try item name, category or price.</div>
             </div>

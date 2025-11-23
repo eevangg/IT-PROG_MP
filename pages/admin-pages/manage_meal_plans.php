@@ -75,7 +75,7 @@
                 <span class="input-group-text bg-success text-white border-success">
                 <i class="bi bi-search"></i>
                 </span>
-                <input type="text" id="planFilter" class="form-control" placeholder="Search meal plan...">
+                <input type="text" id="planFilter" class="form-control" placeholder="Search meal plan..." data-table="mealPlansTable">
             </div>
             <div class="form-text">Tip: Try plan id, day of the week or week start.</div>
             </div>

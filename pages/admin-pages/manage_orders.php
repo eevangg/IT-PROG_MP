@@ -57,7 +57,7 @@ include('../../includes/sidebar.php');
                 <span class="input-group-text bg-success text-white border-success">
                 <i class="bi bi-search"></i>
                 </span>
-                <input type="text" id="orderFilter" class="form-control" placeholder="Search order id, plan id, date...">
+                <input type="text" id="orderFilter" class="form-control" placeholder="Search order id, plan id, date..." data-table="ordersTable">
             </div>
             <div class="form-text">Tip: Try order id or order date.</div>
             </div>

@@ -11,6 +11,14 @@
         $weekStartDate = $conn->real_escape_string(trim($_POST['week_start']));
         $available_qty = intval($_POST['available_qty']);
 
+        // check if the week start date is a Monday
+        $date = new DateTime($weekStartDate);   
+        if ($date->format('N') != 1) {
+            echo json_encode(["status" => "error", "message" => "Week start date must be a Monday."]);
+            $conn->close();
+            exit();
+        }
+
         // Update meal plan in the database
         $sql = "UPDATE meal_plans SET item_id = ?, day_of_week = ?, week_start = ?, available_qty = ? WHERE plan_id = ?";
         $stmt = $conn->prepare($sql);

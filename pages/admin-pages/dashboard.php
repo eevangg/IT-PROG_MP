@@ -82,7 +82,7 @@ include('../../includes/sidebar.php');
       <a href="manage_menu.php" class="btn btn-success mx-2">Manage Menu</a>
       <a href="manage_meal_plans.php" class="btn btn-success mx-2">Meal Plans</a>
       <a href="manage_users.php" class="btn btn-success mx-2">User Management</a>
-      <a href="#" class="btn btn-success mx-2">View Reports</a>
+      <a href="reports.php" class="btn btn-success mx-2">View Reports</a>
     </div>
   </div>
 

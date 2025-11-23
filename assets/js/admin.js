@@ -231,24 +231,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
-    // Handle search filter
-    const filters = document.querySelectorAll('#orderFilter, #menuFilter, #planFilter, .userFilter');
+    // user search filter
+    const filters = document.querySelectorAll('#userFilter');
     if (filters.length > 0) {
         filters.forEach(filter => {
 
             filter.addEventListener('keyup', function () {
                 const query = this.value.toLowerCase();
-                let tableId = null;
 
-                if (this.id === 'orderFilter'){
-                        tableId = 'ordersTable';
-                } else if (this.id === 'menuFilter'){
-                        tableId = 'menuItemsTable';
-                } else if (this.id === 'planFilter'){
-                        tableId = 'mealPlansTable';
-                } 
-
-                const rows = document.querySelectorAll(`#${tableId} tr`);
+                const rows = document.querySelectorAll(`.usersTable tr`);
             
                 rows.forEach(row => {
                     const text = row.textContent.toLowerCase();
@@ -258,6 +249,19 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+    // Universal table filter
+    document.querySelectorAll('[data-table]').forEach(input => {
+        input.addEventListener('keyup', function () {
+            const query   = this.value.toLowerCase();
+            const tableId = this.dataset.table;
+
+            const rows = document.querySelectorAll(`#${tableId} tr`);
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    });
 
 
     // Handle delete order and delete menu item
@@ -535,6 +539,69 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    
+    // check if passwords match
+    const confirmPassword = document.getElementById("#confirm_password");
+    if (confirmPassword) {
+        confirmPassword.addEventListener("input", function() {
+            const password = document.getElementById("#password");
+            const passwordFeedback = document.querySelector("#confirm_password .invalid-feedback");
+    
+            if (password.value !== confirmPassword.value) {
+                passwordFeedback.textContent = "Passwords do not match.";
+                this.classList.add('was-validated');
+            } else {
+                passwordFeedback.textContent = "";
+            }
+        });
+    }
 
 
+    // Handle new admin/staff user creation form submission
+    const createUserForm = document.getElementById("createUserForm");
+    if (createUserForm) { 
+        createUserForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            // ensure passwords match
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm_password").value;
+            if (password !== confirmPassword) {
+                e.stopPropagation();
+                showToast('Passwords do not match.', false);
+                return;
+            }
+
+            // validate form inputs
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData(createUserForm);
+
+            try {
+                const response = await fetch('../../processes/admin-processes/process_create_user.php', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    createUserForm.reset();
+                    showToast(data.message, true);
+
+                } else {
+                    showToast(data.message, false);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while creating the user.', false);
+            }
+        });
+    }
 });
