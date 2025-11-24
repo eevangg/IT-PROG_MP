@@ -20,6 +20,18 @@
     document.getElementById('registerForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
+        // check if passwords match before submitting
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirm_password").value;
+        if (password !== confirmPassword) {
+            const feedback = document.querySelector(".confirm_password .invalid-feedback");
+            feedback.textContent = "Passwords do not match";
+            document.getElementById("confirm_password").setCustomValidity("Passwords do not match");
+        }else {
+            document.getElementById("confirm_password").setCustomValidity("");
+        }
+
+        // Validate form
         if (!this.checkValidity()) {
             e.stopPropagation();
             this.classList.add('was-validated');

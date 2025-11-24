@@ -45,7 +45,7 @@
                     <input type="password" class="form-control" id="password" name="password" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
                     <div class="invalid-feedback">Please enter a password.</div>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3  confirm_password">
                     <label for="confirm_password" class="form-label">Confirm Password</label>
                     <input type="password" class="form-control" id="confirm_password" name="confirm_password" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
                     <div class="invalid-feedback">Please confirm your password.</div>

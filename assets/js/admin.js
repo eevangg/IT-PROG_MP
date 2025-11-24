@@ -567,9 +567,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirm_password").value;
             if (password !== confirmPassword) {
-                e.stopPropagation();
-                showToast('Passwords do not match.', false);
-                return;
+                //e.stopPropagation();
+                document.querySelector(".confirm_password .invalid-feedback").textContent = "Passwords do not match.";
+                document.getElementById("confirm_password").setCustomValidity("Passwords do not match.");
+
+                //showToast('Passwords do not match.', false);
+                //return;
+            }else {
+                document.getElementById("confirm_password").setCustomValidity("");
             }
 
             // validate form inputs
