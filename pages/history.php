@@ -1,21 +1,74 @@
 <?php
 $pageTitle = "Order History - ArcherInnov Canteen Pre-order System";
 include('../includes/header.php'); 
+include('../config/db.php');
+
+$userId = $_SESSION['user_id'];
+$orders = [];
+
+$orderSql = "SELECT order_id, order_date, total_amount, status FROM orders WHERE user_id = ? ORDER BY order_date DESC";
+$stmt = $conn->prepare($orderSql);
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$orderResult = $stmt->get_result();
+
+while ($row = $orderResult->fetch_assoc()) {
+    $orders[] = $row;
+}
+
+$stmt->close();
 ?>
 
 <section id="history" class="container my-5 fullHeight">
   <h2>Order History</h2>
-  <table class="history-table">
-    <tr>
-      <th>Date</th><th>Items</th><th>Total</th><th>Status</th>
-    </tr>
-    <tr>
-      <td>Nov 5, 2025</td><td>Ham Sandwich</td><td>₱40</td><td>Completed</td>
-    </tr>
-    <tr>
-      <td>Nov 6, 2025</td><td>Chicken Adobo</td><td>₱75</td><td>Completed</td>
-    </tr>
-  </table>
+
+  <?php if (empty($orders)): ?>
+    <div class="alert alert-info mt-4" role="alert">
+      You haven't placed any orders yet. Visit the <a href="menu.php" class="alert-link">menu</a> to get started.
+    </div>
+  <?php else: ?>
+    <div class="table-responsive">
+      <table class="table table-striped history-table align-middle">
+        <thead class="table-success">
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Items</th>
+            <th scope="col">Total</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($orders as $order): ?>
+            <?php
+              $itemsSql = "SELECT mi.item_name, od.quantity
+                           FROM order_details od
+                           JOIN menu_items mi ON mi.item_id = od.item_id
+                           WHERE od.order_id = ?";
+              $itemsStmt = $conn->prepare($itemsSql);
+              $itemsStmt->bind_param("i", $order['order_id']);
+              $itemsStmt->execute();
+              $itemsResult = $itemsStmt->get_result();
+              $itemDescriptions = [];
+
+              while ($itemRow = $itemsResult->fetch_assoc()) {
+                  $safeName = $itemRow['item_name'];
+                  $itemDescriptions[] = "{$safeName} (x{$itemRow['quantity']})";
+              }
+              $itemsText = empty($itemDescriptions) ? 'No items recorded' : implode(', ', $itemDescriptions);
+              $itemsStmt->close();
+            ?>
+            <tr>
+              <td><?= date('M j, Y', strtotime($order['order_date'])) ?></td>
+              <td><?= htmlspecialchars($itemsText) ?></td>
+              <td>₱<?= number_format($order['total_amount'], 2) ?></td>
+              <td><?= ucfirst(htmlspecialchars($order['status'])) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  <?php endif; ?>
 </section>
 
+<?php $conn->close(); ?>
 <?php include('../includes/footer.php'); ?>

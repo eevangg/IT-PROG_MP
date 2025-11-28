@@ -4,6 +4,13 @@ include('../includes/header.php');
 ?>
 
 <section id="menu" class="container my-5 fullHeight"> 
+  <?php if (!empty($_SESSION['cart_feedback'])): ?>
+    <div class="alert alert-<?= $_SESSION['cart_feedback']['type'] ?> alert-dismissible fade show" role="alert">
+      <?= htmlspecialchars($_SESSION['cart_feedback']['message']) ?>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <?php unset($_SESSION['cart_feedback']); ?>
+  <?php endif; ?>
 
   <!-- Search Bar -->
   <div class="mb-4">
@@ -65,7 +72,18 @@ include('../includes/header.php');
                 <br>
                 <p class="card-text"><strong>Available Stock:</strong> <?= $item['stock']?></p>
                 <div class="mt-auto">
-                    <a href="order.php?id=<?= $item['id'] ?>" class="btn btn-success d-grid gap-2"><i class="bi bi-cart-plus"> add to cart</i></a>
+                    <form action="../processes/process_menu.php" method="POST" class="d-grid gap-2">
+                      <input type="hidden" name="action" value="add_to_cart">
+                      <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
+                      <input type="hidden" name="redirect" value="../pages/menu.php">
+                      <div class="input-group">
+                        <span class="input-group-text">Qty</span>
+                        <input type="number" name="quantity" class="form-control" min="1" max="<?= $item['stock'] ?>" value="1" required>
+                      </div>
+                      <button type="submit" class="btn btn-success">
+                        <i class="bi bi-cart-plus"></i> Add to Cart
+                      </button>
+                    </form>
                 </div>
               </div>
             </div>
