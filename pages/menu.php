@@ -5,16 +5,36 @@ include('../includes/header.php');
 
 <section id="menu" class="container my-5 fullHeight"> 
 
-  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-      <div class="input-group">
-        <span class="input-group-text bg-success text-white border-success">
-          <i class="bi bi-search"></i>
-        </span>
-        <input type="text" id="menuFilter" class="form-control" placeholder="Search by Meal, Price, Category, Description...">
-      </div>
+  <!-- Search Bar -->
+  <div class="mb-4">
+    <div class="input-group">
+      <span class="input-group-text bg-success text-white border-success">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" id="menuSearch" class="form-control" placeholder="Search by meal name...">
+    </div>
   </div>
 
-    <br>
+  <!-- Filter Controls -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <label for="categoryFilter" class="form-label"><strong>Filter by Category</strong></label>
+      <select id="categoryFilter" class="form-select">
+        <option value="">All Categories</option>
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label for="priceFilter" class="form-label"><strong>Filter by Price Range</strong></label>
+      <select id="priceFilter" class="form-select">
+        <option value="">All Prices</option>
+        <option value="0-100">₱0 - ₱100</option>
+        <option value="100-200">₱100 - ₱200</option>
+        <option value="200-300">₱200 - ₱300</option>
+        <option value="300-9999">₱300+</option>
+      </select>
+    </div>
+  </div>
+
   <h2>Today's Menu</h2>
   <br>
   <div class="menu-grid">
@@ -24,14 +44,18 @@ include('../includes/header.php');
       $menuQuery = "SELECT * FROM menu_items WHERE stock > 0 AND status = 'active' ORDER BY item_name ASC";
       $menuResult = $conn->query($menuQuery);
       $menu = [];
+      $categories = [];
       while ($row = $menuResult->fetch_assoc()) {
           $menu[] = $row;
+          if (!in_array($row['category'], $categories)) {
+              $categories[] = $row['category'];
+          }
       }
 
       echo '<div class="row g-2">';
      foreach ($menu as $item): ?> 
           <div class="col-md-3">
-            <div class="card menu-cards d-flex flex-column h-100">
+            <div class="card menu-cards d-flex flex-column h-100" data-name="<?= strtolower($item['item_name']) ?>" data-category="<?= $item['category'] ?>" data-price="<?= $item['price'] ?>">
               <img src="../assets/images/menu_items/<?= $item['image']?>" class="card-img-top" alt="">
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title"><?= $item['item_name'] ?></h5>
@@ -48,8 +72,23 @@ include('../includes/header.php');
           </div>
     <?php endforeach;  echo '</div>' ?>
     <?php $conn->close(); ?>
-
+      
   </div>
 </section>
 
 <?php include('../includes/footer.php'); ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Populate category dropdown
+    const categories = <?php echo json_encode($categories); ?>;
+    const categorySelect = document.getElementById('categoryFilter');
+    
+    categories.forEach(category => {
+        let option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
+});
+</script>
