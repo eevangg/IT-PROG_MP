@@ -27,12 +27,12 @@
             <form class="needs-validation" method="POST" id="createUserForm" novalidate>
                 <div class="mb-3">
                     <label for="full_name" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="full_name" name="full_name" required>
+                    <input type="text" class="form-control" id="full_name" name="full_name" required pattern="^[A-Za-zÀ-ÿ' -]{2,} [A-Za-zÀ-ÿ' -]{2,}$">
                     <div class="invalid-feedback">Please enter the full name.</div>
                 </div>
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
+                    <input type="text" class="form-control" id="username" name="username" required pattern="^[A-Za-z][A-Za-z0-9_-]{2,14}$">
                     <div class="invalid-feedback">Please enter a username.</div>
                 </div>
                 <div class="mb-3">
