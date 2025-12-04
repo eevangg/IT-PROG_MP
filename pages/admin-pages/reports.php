@@ -3,8 +3,149 @@
     $pageTitle = "Reports - ArcherInnov Canteen Pre-order System";
     include('../../includes/sidebar.php'); 
 
+    include('../../config/db.php');
+    /* ---------- AJAX HANDLER ---------- */
+    if (isset($_POST['ajax']) && $_POST['ajax'] === '1') {
 
-    
+        $reportType = $_POST['reportType'];
+        $month = $_POST['month'];
+        $year  = $_POST['year'];
+
+        ob_start();  // capture HTML output
+
+        /* ---------------- SALES REPORT ---------------- */
+        if ($reportType === 'sales-report') {
+
+            $sql = "SELECT o.order_date AS order_date, m.item_name AS meal, m.category AS category,
+                        SUM(od.quantity) AS total_quantity,
+                        SUM(od.quantity * m.price) AS total_price
+                    FROM orders o
+                    JOIN order_details od ON o.order_id = od.order_id
+                    JOIN menu_items m ON od.item_id = m.item_id
+                    WHERE o.status = 'completed'
+                    AND MONTH(o.order_date) = ?
+                    AND YEAR(o.order_date) = ?
+                    GROUP BY m.item_name, o.order_date
+                    ORDER BY o.order_date DESC";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ii", $month, $year);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        ?>
+
+        <!-- Output HTML table -->
+        <table class="table table-striped table-hover mt-4">
+            <thead class="table-success text-center">
+            <tr>
+                <th>Date</th>
+                <th>Meal</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr class="text-center">
+                    <td><?= $row['order_date'] ?></td>
+                    <td><?= $row['meal'] ?></td>
+                    <td><?= $row['category'] ?></td>
+                    <td><?= $row['total_quantity'] ?></td>
+                    <td><?= number_format($row['total_price'], 2) ?></td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
+
+        <?php
+        }
+
+        /* ---------------- ORDER TRENDS report ---------------- */
+        if ($reportType === 'order-trends') {
+
+            $sql = "SELECT m.item_name, 
+                        COUNT(o.order_id) AS total_orders,
+                        SUM(od.quantity * m.price) AS total_revenue
+                    FROM orders o
+                    JOIN order_details od ON o.order_id = od.order_id
+                    JOIN menu_items m ON od.item_id = m.item_id
+                    WHERE o.status='completed'
+                    AND MONTH(o.order_date)=?
+                    AND YEAR(o.order_date)=?
+                    GROUP BY m.item_name
+                    ORDER BY total_orders DESC";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ii", $month, $year);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        ?>
+        <table class="table table-bordered mt-4">
+            <thead class="table-dark">
+            <tr>
+                <th>Meal</th>
+                <th>Total Orders</th>
+                <th>Total Revenue</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['item_name'] ?></td>
+                    <td><?= $row['total_orders'] ?></td>
+                    <td>₱<?= number_format($row['total_revenue'], 2) ?></td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
+        <?php
+        }
+
+        /* ---------------- INVENTORY REPORT ---------------- */
+        if ($reportType === 'inventory-report') {
+
+            $sql = "SELECT *
+                    FROM inventory_logs i
+                    JOIN menu_items m ON i.item_id = m.item_id
+                    WHERE MONTH(i.log_date) = ?
+                    AND YEAR(i.log_date) = ?
+                    ORDER BY i.log_date DESC";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ii", $month, $year);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        ?>
+        <table class="table table-bordered mt-4">
+            <thead class="table-info">
+                <tr>
+                    <th>Date</th>
+                    <th>Item</th>
+                    <th>Action</th>
+                    <th>Qty</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['log_date'] ?></td>
+                    <td><?= $row['item_name'] ?></td>
+                    <td><?= $row['action'] ?></td>
+                    <td><?= $row['quantity'] ?></td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
+        <?php
+        }
+
+        // SEND THE GENERATED HTML BACK TO JS
+        $html = ob_get_clean();
+        echo $html;
+        exit;
+    }
+
 ?>
 
 <main class="admin-content container my-5 fullHeight d-flex flex-column align-items-center justify-content-start">
@@ -77,130 +218,43 @@
         </form>
     </div> 
     <br><hr><br>
-    <script>
-        const reportTypeInput = document.getElementById("reportType");
-        document.getElementById("sales-report").addEventListener("click", () => {
-            reportTypeInput.value = "sales-report";
-        });
-
-        document.getElementById("order-trends").addEventListener("click", () => {
-            reportTypeInput.value = "order-trends";
-        });
-
-        document.getElementById("inventory-report").addEventListener("click", () => {
-            reportTypeInput.value = "inventory-report";
-        });
-
-        document.getElementById('report_form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-        });
-    </script>
     
-    <?php
-        include('../../config/db.php');
-
-        $reportType = $_POST['reportType'] ?? null;
-        $month = $_POST['month'] ?? null;
-        $year  = $_POST['year'] ?? null;
-
-        if ($reportType === 'sales-report') {
-            $sql = "SELECT o.order_date AS order_date, m.item_name AS meal, m.category AS category, SUM(od.quantity) AS total_quantity, SUM(od.quantity * m.price) AS total_price
-                    FROM orders
-                    JOIN order_details od ON o.order_id = od.order_id
-                    JOIN menu_items m ON od.item_id = m.item_id
-                    WHERE o.status = 'completed' 
-                    AND MONTH(o.order_date) = ? 
-                    AND YEAR(o.order_date) = ? 
-                    ORDER BY 0.order_date DESC";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ii", $month, $year);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $orders = [];
-            while ($row = $result->fetch_assoc()) {
-                $orders[] = $row;
-            }
-            $stmt->close();
-        }
-
-        if ($reportType === 'order-trends') {
-            $sql = "SELECT 
-                    m.item_name,
-                    COUNT(o.order_id) AS total_orders,
-                    SUM(o.total_amount) AS total_revenue
-                FROM orders o
-                JOIN order_details od ON o.order_id = od.order_id
-                JOIN menu_items m ON od.item_id = m.item_id
-                WHERE o.status = 'completed'
-                AND MONTH(o.order_date) = ?
-                AND YEAR(o.order_date) = ?
-                GROUP BY m.item_name
-                ORDER BY total_orders DESC, total_revenue DESC";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ii", $month, $year);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $orderTrend = [];
-            while ($row = $result->fetch_assoc()) {
-                $orderTrend = $row;
-            }
-            $stmt->close();
-        }
-
-        if($reportType === 'inventory-report'){
-            $sql = "SELECT * FROM inventory_logs i
-                    JOIN menu_items m on i.item_id = m.item_id
-                    WHERE MONTH(i.log_date) = ?
-                    AND YEAR(i.log_date) = ?
-                    ORDER BY i.log_date DESC";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ii", $month, $year);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $inventoryReport = [];
-            while ($row = $result->fetch_assoc()) {
-                $inventoryReport = $row;
-            }
-            $stmt->close();
-        }
-    ?>
-    <div class="reports-display">
-        <?php if ($reportType === 'sales-report'): ?>
-            <div class="table-responsive mt-4">
-                <table class="table table-striped table-hover align-middle" id="salesReportTable">
-                    <thead class="table-success text-center">
-                        <tr>
-                            <th>Date</th>
-                            <th>Meal</th>
-                            <th>Category</th>
-                            <th>Quantity Ordered</th>
-                            <th>Total Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody id="salesReportBody">
-                        <?php foreach ($orders as $order): ?>
-                            <tr class="text-center">
-                                <td><?=$order['order_date'] ?></td>
-                                <td><?=$order['meal'] ?></td>
-                                <td><?=$order['category'] ?></td>
-                                <td><?=$order['total_quantity'] ?></td>
-                                <td><?=$order['total_price'] ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-
-        <?php elseif ($reportType === 'order-trends'): ?>
+ 
+    <div class="reports_display">
         
-        <?php elseif ($reportType === 'inventory-report'): ?>
-
-        <?php endif; ?>
     </div>
+
+    
 </main>
+
+<script>
+    const reportArea = document.querySelector(".reports_display");
+    const reportTypeInput = document.getElementById("reportType");
+
+    // attach click handlers
+    ["sales-report","order-trends","inventory-report"].forEach(id => {
+        document.getElementById(id).addEventListener("click", () => {
+            reportTypeInput.value = id;
+            submitReport();
+        });
+    });
+
+    // AJAX function
+    async function submitReport() {
+        const form = document.getElementById('report_form');
+        const formData = new FormData(form);
+        formData.append("ajax", "1");
+
+        const response = await fetch("", {
+            method: "POST",
+            body: formData
+        });
+
+        const html = await response.text();
+
+        reportArea.innerHTML = "";      // clear old report
+        reportArea.innerHTML = html;    // display new report
+    }
+</script>
 
 <?php include('../../includes/closing.php'); ?>
