@@ -1,6 +1,6 @@
 <?php
 // Database credentials
-$servername = "localhost:3308"; 
+$servername = "localhost"; 
 $username = "root";
 $password = "";
 $database = "canteen_preorder_db";
