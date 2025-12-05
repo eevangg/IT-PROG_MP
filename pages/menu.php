@@ -42,53 +42,78 @@ include('../includes/header.php');
     </div>
   </div>
 
-  <h2>Today's Menu</h2>
+  <h2>This Week's Meal Plan</h2>
   <br>
   <div class="menu-grid">
     <?php
       include ("../config/db.php");
       
-      $menuQuery = "SELECT * FROM menu_items WHERE stock > 0 AND status = 'active' ORDER BY item_name ASC";
-      $menuResult = $conn->query($menuQuery);
-      $menu = [];
+      $today = date('Y-m-d');
+      $monday = date('Y-m-d', strtotime('monday this week'));
+
+      $menuQuery = "SELECT * FROM meal_plans mp 
+                    JOIN menu_items m ON m.item_id = mp.item_id
+                    WHERE m.stock > 0 AND m.status = 'active' AND mp.week_start = ?
+                    ORDER BY FIELD(mp.day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), m.item_name";
+      
+      $stmt = $conn->prepare($menuQuery);
+      $stmt->bind_param("s", $monday);
+      $stmt->execute();
+      $menuResult = $stmt->get_result();
+  
+      $weeklyMeals = [];
       $categories = [];
       while ($row = $menuResult->fetch_assoc()) {
-          $menu[] = $row;
+          $weeklyMeals[$row['day_of_week']][] = $row;
           if (!in_array($row['category'], $categories)) {
               $categories[] = $row['category'];
           }
       }
 
-      echo '<div class="row g-2">';
-     foreach ($menu as $item): ?> 
-          <div class="col-md-3">
-            <div class="card menu-cards d-flex flex-column h-100" data-name="<?= strtolower($item['item_name']) ?>" data-category="<?= $item['category'] ?>" data-price="<?= $item['price'] ?>">
-              <img src="../assets/images/menu_items/<?= $item['image']?>" class="card-img-top" alt="">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title"><?= $item['item_name'] ?></h5>
-                <p class="card-subtitle mb-2 text-body-secondary"><?= $item['category']?></p>
-                <h3 class="card-text mb-1">₱ <?= $item['price']?></h3>
-                <p class="card-text mb-0"><?= $item['description']?></p>
-                <br>
-                <p class="card-text"><strong>Available Stock:</strong> <?= $item['stock']?></p>
-                <div class="mt-auto">
-                    <form action="../processes/process_menu.php" method="POST" class="d-grid gap-2">
-                      <input type="hidden" name="action" value="add_to_cart">
-                      <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
-                      <input type="hidden" name="redirect" value="../pages/menu.php">
-                      <div class="input-group">
-                        <span class="input-group-text">Qty</span>
-                        <input type="number" name="quantity" class="form-control" min="1" max="<?= $item['stock'] ?>" value="1" required>
-                      </div>
-                      <button type="submit" class="btn btn-success">
-                        <i class="bi bi-cart-plus"></i> Add to Cart
-                      </button>
-                    </form>
+      $days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+    ?>
+
+    <?php foreach ($days as $day): ?>
+        <h3 class='mt-4'><?= $day ?></h3>
+
+      <div class="row g-2">
+      <?php if (!empty($weeklyMeals[$day])): ?>
+        <?php foreach ($weeklyMeals[$day] as $item): ?> 
+              <div class="col-md-3">
+                <div class="card menu-cards d-flex flex-column h-100" data-name="<?= strtolower($item['item_name']) ?>" data-category="<?= $item['category'] ?>" data-price="<?= $item['price'] ?>">
+                  <img src="../assets/images/menu_items/<?= $item['image']?>" class="card-img-top" alt="">
+                  <div class="card-body d-flex flex-column">
+                    <h5 class="card-title"><?= $item['item_name'] ?></h5>
+                    <p class="card-subtitle mb-2 text-body-secondary"><?= $item['category']?></p>
+                    <h3 class="card-text mb-1">₱ <?= $item['price']?></h3>
+                    <p class="card-text mb-0"><?= $item['description']?></p>
+                    <br>
+                    <p class="card-text"><strong>Available Stock:</strong> <?= $item['available_qty']?></p>
+                    <div class="mt-auto">
+                        <form action="../processes/process_menu.php" method="POST" class="d-grid gap-2">
+                          <input type="hidden" name="action" value="add_to_cart">
+                          <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
+                          <input type="hidden" name="redirect" value="../pages/menu.php">
+                          <div class="input-group">
+                            <span class="input-group-text">Qty</span>
+                            <input type="number" name="quantity" class="form-control" min="1" max="<?= $item['available_qty'] ?>" value="1" required>
+                          </div>
+                          <button type="submit" class="btn btn-success">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                          </button>
+                        </form>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-    <?php endforeach;  echo '</div>' ?>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <div>
+          <p>No meals planned for this day.</p>
+        </div>
+      <?php endif; ?>
+      </div>
+    <?php endforeach; ?>
     <?php $conn->close(); ?>
       
   </div>

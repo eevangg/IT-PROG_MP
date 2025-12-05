@@ -43,7 +43,7 @@
                     feedback.textContent += ' Redirecting to staff dashboard...';
                     window.setTimeout(() => {
                         feedback.textContent  = '';
-                        window.location.href = 'staff.php';
+                        window.location.href = 'admin-pages/dashboard.php';
                     }, 2000);
                 }
             } else if (result.error) {

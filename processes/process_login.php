@@ -44,6 +44,7 @@
                     echo json_encode(['success' => "Login successful!", 'role' => 'admin']);
                     //header("Location: pages/admin_dashboard.php");
                 } elseif ($user['user_type'] == 'staff') {
+                    $_SESSION['is_staff'] = true;
                     echo json_encode(['success' => "Login successful!", 'role' => 'staff']);
                     //header("Location: pages/staff_dashboard.php");
                 } else {

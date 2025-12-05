@@ -8,8 +8,8 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-if (isset($_SESSION['username']) && !isset($_SESSION['is_admin'])) {
-    header("Location: ../pages/error_pages/access_denied.php");
+if (isset($_SESSION['username']) && (!isset($_SESSION['is_admin']) && !isset($_SESSION['is_staff']))) {
+    header("Location: ../access_denied.php");
     exit();
 }
 ?>
@@ -39,35 +39,37 @@ if (isset($_SESSION['username']) && !isset($_SESSION['is_admin'])) {
         <h4 class="text-white mb-4 text-center fw-bold">Canteen Admin</h4>
         <ul class="nav flex-column">
           <li class="nav-item mb-2">
-            <a href="dashboard.php" class="nav-link text-white <?php if ($pageTitle === 'Admin Dashboard - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>">
+            <a href="dashboard.php" class="nav-link text-white <?php if ($pageTitle === 'Management Dashboard - ArcherInnov Canteen Pre-order System') echo 'active' ?>>">
               <i class="bi bi-speedometer2 me-2"></i> Dashboard
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="manage_orders.php" class="nav-link text-white <?php if ($pageTitle === 'Manage Orders - ArcherInnov Canteen Pre-order System') : ?> active<?php endif?>">
+            <a href="manage_orders.php" class="nav-link text-white <?php if ($pageTitle === 'Manage Orders - ArcherInnov Canteen Pre-order System') echo 'active' ?>>">
               <i class="bi bi-receipt-cutoff me-2"></i> Manage Orders
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="manage_menu.php" class="nav-link text-white <?php if ($pageTitle === 'Menu Management - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>">
+            <a href="manage_menu.php" class="nav-link text-white <?php if ($pageTitle === 'Menu Management - ArcherInnov Canteen Pre-order System') echo 'active' ?>>">
               <i class="bi bi-list-ul me-2"></i> Menu Management
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="manage_meal_plans.php" class="nav-link text-white<?php if ($pageTitle === 'Meal Plans - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>?>">
+            <a href="manage_meal_plans.php" class="nav-link text-white<?php if ($pageTitle === 'Meal Plans - ArcherInnov Canteen Pre-order System') echo 'active' ?>>">
               <i class="bi bi-journal-bookmark me-2"></i> Meal Plans
             </a>
           </li>
-            <li class="nav-item mb-2">
-                <a href="manage_users.php" class="nav-link text-white <?php if ($pageTitle === 'User Management - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>">
-                <i class="bi bi-people me-2"></i> User Management
-                </a>
-            </li>
-            <li class="nav-item mb-2">
-                <a href="reports.php" class="nav-link text-white <?php if ($pageTitle === 'Reports - ArcherInnov Canteen Pre-order System'): ?> active<?php endif?>">
-                <i class="bi bi-bar-chart-line me-2"></i> Reports
-                </a>
-            </li>
+            <?php if (isset($_SESSION['is_admin'])) : ?>
+              <li class="nav-item mb-2">
+                  <a href="manage_users.php" class="nav-link text-white <?php if ($pageTitle === 'User Management - ArcherInnov Canteen Pre-order System') echo 'active' ?>>">
+                  <i class="bi bi-people me-2"></i> User Management
+                  </a>
+              </li>
+              <li class="nav-item mb-2">
+                  <a href="reports.php" class="nav-link text-white <?php if ($pageTitle === 'Reports - ArcherInnov Canteen Pre-order System') echo 'active' ?>>">
+                  <i class="bi bi-bar-chart-line me-2"></i> Reports
+                  </a>
+              </li>
+            <?php endif; ?>
         </ul>
       </div>
       <div>

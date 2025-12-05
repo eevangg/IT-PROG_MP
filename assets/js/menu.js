@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const menuSearch = document.getElementById('menuSearch');
     const categoryFilter = document.getElementById('categoryFilter');
     const priceFilter = document.getElementById('priceFilter');
-    
+ 
     // Function to check if item matches all filters
     function filterItems() {
         const searchQuery = menuSearch?.value.toLowerCase() || '';
