@@ -34,35 +34,35 @@
             $result = $stmt->get_result();
         ?>
 
-        <!-- Output HTML table -->
-        <div class="card shadow-sm w-100 mb-4">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
-                        <thead class="table-success text-center">
-                        <tr>
-                            <th>Date</th>
-                            <th>Meal</th>
-                            <th>Category</th>
-                            <th>Qty</th>
-                            <th>Total (₱)</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr class="text-center">
-                                <td><?= date('Y-m-d', strtotime($row['order_date'])) ?></td>
-                                <td><?= $row['meal'] ?></td>
-                                <td><?= $row['category'] ?></td>
-                                <td><?= $row['total_quantity'] ?></td>
-                                <td>₱<?= number_format($row['total_price'], 2) ?></td>
+            <!-- Output HTML table -->
+            <div class="card shadow-sm w-100 mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-success text-center">
+                            <tr>
+                                <th>Date</th>
+                                <th>Meal</th>
+                                <th>Category</th>
+                                <th>Qty</th>
+                                <th>Total (₱)</th>
                             </tr>
-                        <?php endwhile; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            <?php while ($row = $result->fetch_assoc()): ?>
+                                <tr class="text-center">
+                                    <td><?= date('Y-m-d', strtotime($row['order_date'])) ?></td>
+                                    <td><?= $row['meal'] ?></td>
+                                    <td><?= $row['category'] ?></td>
+                                    <td><?= $row['total_quantity'] ?></td>
+                                    <td>₱<?= number_format($row['total_price'], 2) ?></td>
+                                </tr>
+                            <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
         <?php
         }
@@ -89,30 +89,30 @@
             $result = $stmt->get_result();
         ?>
 
-        <div class="card shadow-sm w-100 mb-4">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
-                        <thead class="table-success text-center">
-                        <tr>
-                            <th>Meal</th>
-                            <th>Total Orders</th>
-                            <th>Total Revenue</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?= $row['item_name'] ?></td>
-                                <td><?= $row['total_orders'] ?></td>
-                                <td>₱<?= number_format($row['total_revenue'], 2) ?></td>
-                            </tr>
-                        <?php endwhile; ?>
-                        </tbody>
-                    </table>
+            <div class="card shadow-sm w-100 mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-success text-center">
+                                <tr>
+                                    <th>Meal</th>
+                                    <th>Total Orders</th>
+                                    <th>Total Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php while ($row = $result->fetch_assoc()): ?>
+                                <tr class="text-center">
+                                    <td><?= $row['item_name'] ?></td>
+                                    <td><?= $row['total_orders'] ?></td>
+                                    <td>₱<?= number_format($row['total_revenue'], 2) ?></td>
+                                </tr>
+                            <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
         <?php
         }
 
@@ -132,32 +132,32 @@
             $result = $stmt->get_result();
         ?>
 
-        <div class="card shadow-sm w-100">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
-                        <thead class="table-success text-center">
-                            <tr>
-                                <th>Date</th>
-                                <th>Item</th>
-                                <th>Action</th>
-                                <th>Qty</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?= $row['log_date'] ?></td>
-                                <td><?= $row['item_name'] ?></td>
-                                <td><?= $row['action'] ?></td>
-                                <td><?= $row['quantity'] ?></td>
-                            </tr>
-                        <?php endwhile; ?>
-                        </tbody>
-                    </table>
+            <div class="card shadow-sm w-100">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-success text-center">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Item</th>
+                                    <th>Change Type</th>
+                                    <th>Qty Changed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php while ($row = $result->fetch_assoc()): ?>
+                                <tr class="text-center">
+                                    <td><?= date('Y-m-d', strtotime($row['log_date'])) ?></td>
+                                    <td><?= $row['item_name'] ?></td>
+                                    <td><?= $row['change_type'] ?></td>
+                                    <td><?= $row['quantity_changed'] ?></td>
+                                </tr>
+                            <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
         <?php
         }
 
@@ -241,7 +241,7 @@
     <br>
     
  
-    <div class="reports-display">
+    <div class="reports-display w-100">
         
     </div>
 </main>
