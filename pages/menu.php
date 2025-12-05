@@ -93,6 +93,7 @@ include('../includes/header.php');
                         <form action="../processes/process_menu.php" method="POST" class="d-grid gap-2">
                           <input type="hidden" name="action" value="add_to_cart">
                           <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
+                          <input type="hidden" name="plan_id" value="<?= $item['plan_id'] ?>">
                           <input type="hidden" name="redirect" value="../pages/menu.php">
                           <div class="input-group">
                             <span class="input-group-text">Qty</span>

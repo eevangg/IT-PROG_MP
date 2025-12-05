@@ -76,6 +76,7 @@ include('../includes/header.php');
     <br>
 
     <div class="profile-actions mt-4 text-center">
+        <a href="#" id="topUpBtn" class="btn btn-success mx-2"><i class="bi bi-cash-coin"></i> Cash in </a>
         <a href="edit_profile.php" class="btn btn-success mx-2">Edit Profile</a>
         <a href="#" id="changePasswordBtn" data-bs-toggle="modal" data-bs-target="#changePasswordModal" class="btn btn-warning mx-2">Change Password</a>
         <a href="#" id="deleteAccountBtn" class="btn btn-danger mx-2">Delete Account</a>
