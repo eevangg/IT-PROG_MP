@@ -1,11 +1,25 @@
 <?php
     session_start();
-    $pageTitle = "Manage Top-ups - ArcherInnov Canteen";
+    $pageTitle = "Manage Top-ups - ArcherInnov Canteen Pre-Order System";
     include('../../includes/sidebar.php'); 
 ?>
 
 <main class="admin-content container my-5 fullHeight d-flex flex-column align-items-center justify-content-start">
+    <?php
+        include ('../../config/db.php');
 
+        // Handle Admin alerts
+        if (isset($_SESSION['admin_msg'])) {
+            $alertType = $_SESSION['admin_msg']['type'];
+            $alertMsg = $_SESSION['admin_msg']['text'];
+            echo "<div class='alert alert-$alertType alert-dismissible fade show m-3' role='alert'>
+                    $alertMsg
+                    <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
+                </div>";
+            unset($_SESSION['admin_msg']);
+        }
+    ?>
+    
     <div class="d-flex justify-content-between align-items-center w-100 mb-3">
         <div class="d-flex align-items-center gap-2">
             <a href="../dashboard.php" class="btn btn-outline-success btn-sm shadow-sm">
@@ -87,20 +101,6 @@
 
     <p class="text-muted text-center">Manage user wallet top-up requests. Approving a request will automatically add funds to the user's balance.</p>
 
-    <?php
-        include ('../../config/db.php');
-
-        // Handle Admin alerts
-        if (isset($_SESSION['admin_msg'])) {
-            $alertType = $_SESSION['admin_msg']['type'];
-            $alertMsg = $_SESSION['admin_msg']['text'];
-            echo "<div class='alert alert-$alertType alert-dismissible fade show m-3' role='alert'>
-                    $alertMsg
-                    <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
-                </div>";
-            unset($_SESSION['admin_msg']);
-        }
-    ?>
     <?php if(count($requests) > 0): ?>
     <div class="card shadow-sm w-100">
         <div class="card-body">

@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const walletRadio = document.getElementById('wallet');
     const walletWarning = document.getElementById('walletWarning');
     const checkoutBtn = document.getElementById('checkoutBtn');
-    const cardRadio = document.getElementById('card');
+    const cardRadio = document.getElementById('gcash');
     const checkoutForm = document.getElementById('checkoutForm');
     const accountBalance = <?= json_encode($accountBalance) ?>;
     const cartTotal = <?= json_encode($cartTotal) ?>;

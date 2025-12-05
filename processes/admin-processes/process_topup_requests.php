@@ -55,6 +55,7 @@
                 $balanceStmt->execute();
 
                 $msg = "Top-up approved. User balance updated.";
+                $_SESSION['balance'] =  $_SESSION['balance'] + $request['amount'];
             } else {
                 // Reject logic
                 $updateStmt = $conn->prepare("UPDATE topup_requests SET status = 'rejected', approved_date = NOW() WHERE request_id = ?");

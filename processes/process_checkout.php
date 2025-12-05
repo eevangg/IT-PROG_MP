@@ -100,26 +100,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Prepare failed: " . $conn->error);
             }
             $item_id = $item['item_id'];
+            $plan_id = $item['plan_id'];
             $quantity = $item['quantity'];
             $price = $item['price'];
             $subtotal = $quantity * $price;
-            $stmt->bind_param("iiii", $order_id, $item_id, $quantity, $subtotal);
+            $stmt->bind_param("iiid", $order_id, $item_id, $quantity, $subtotal);
             if (!$stmt->execute()) {
                 throw new Exception("Execute failed: " . $stmt->error);
             }
             $stmt->close();
 
             // Update inventory
-            $sql = "UPDATE menu_items SET stock = stock - ? WHERE item_id = ?";
-            $stmt = $conn->prepare($sql);
-            if (!$stmt) {
+            $sql = "UPDATE menu_items SET stock = stock - ? WHERE item_id = ? AND stock >= 0";
+            $planQuery = "UPDATE meal_plans SET available_qty = available_qty - ? WHERE plan_id = ?";
+            $stmt1 = $conn->prepare($sql);
+            $stmt2 = $conn->prepare($planQuery);
+            if (!$stmt1 && !$stmt2) {
                 throw new Exception("Prepare failed: " . $conn->error);
             }
-            $stmt->bind_param("ii", $quantity, $item_id);
-            if (!$stmt->execute()) {
+            $stmt1->bind_param("ii", $quantity, $item_id);
+            $stmt2->bind_param("ii", $quantity, $plan_id);
+            if (!$stmt1->execute() || !$stmt2->execute()) {
                 throw new Exception("Execute failed: " . $stmt->error);
             }
-            $stmt->close();
+            $stmt1->close();
+            $stmt2->close();
         }
 
         // Deduct from wallet if payment method is wallet
