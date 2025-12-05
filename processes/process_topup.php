@@ -3,6 +3,9 @@ session_start();
 include "../config/db.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // 1. Capture where the user came from (Default to 'checkout')
+    $redirect_source = $_POST['redirect_to'] ?? 'checkout'; 
+
     // Validate session
     if (!isset($_SESSION['user_id'])) {
         $_SESSION['cart_feedback'] = ['type' => 'danger', 'message' => 'Session expired. Please login again.'];
@@ -13,18 +16,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     $topup_amount = $_POST['topup_amount'] ?? null;
 
+    // Define redirect function to avoid code repetition
+    function doRedirect($source) {
+        if ($source === 'profile') {
+            header("Location: ../pages/profile.php");
+        } else {
+            header("Location: ../pages/checkout.php");
+        }
+        exit();
+    }
+
     // Validate amount
     if (!$topup_amount || $topup_amount <= 0) {
         $_SESSION['cart_feedback'] = ['type' => 'danger', 'message' => 'Please enter a valid amount.'];
-        header("Location: ../pages/checkout.php");
-        exit();
+        doRedirect($redirect_source);
     }
 
     // Validate amount is numeric
     if (!is_numeric($topup_amount)) {
         $_SESSION['cart_feedback'] = ['type' => 'danger', 'message' => 'Amount must be a valid number.'];
-        header("Location: ../pages/checkout.php");
-        exit();
+        doRedirect($redirect_source);
     }
 
     $topup_amount = floatval($topup_amount);
@@ -61,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt->close();
 
+        // Success Message
         $_SESSION['cart_feedback'] = [
             'type' => 'success', 
             'message' => 'Top-up request submitted! Amount: ₱' . number_format($topup_amount, 2) . ' is pending admin approval.'
@@ -72,9 +84,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->close();
     }
 
-    header("Location: ../pages/checkout.php");
-    exit();
+    // Final Redirect based on source
+    doRedirect($redirect_source);
+
 } else {
+    // If someone tries to access file directly without POST
     header("Location: ../pages/checkout.php");
     exit();
 }

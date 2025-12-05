@@ -15,6 +15,15 @@ include('../includes/header.php');
         <p class="text-muted">Here you can view and manage your profile.</p>
     </div>
 
+    <?php if (isset($_SESSION['cart_feedback'])): ?>
+        <div class="alert alert-<?= $_SESSION['cart_feedback']['type'] ?> alert-dismissible fade show w-100 mb-4" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            <?= $_SESSION['cart_feedback']['message'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <?php unset($_SESSION['cart_feedback']); ?>
+    <?php endif; ?>
+    
     <?php
         include("../config/db.php");
 
@@ -76,13 +85,52 @@ include('../includes/header.php');
     <br>
 
     <div class="profile-actions mt-4 text-center">
-        <a href="#" id="topUpBtn" class="btn btn-success mx-2"><i class="bi bi-cash-coin"></i> Cash in </a>
+        <button type="button" class="btn btn-success mx-2" data-bs-toggle="modal" data-bs-target="#topUpModal">
+            <i class="bi bi-cash-coin"></i> Cash in
+        </button>
         <a href="edit_profile.php" class="btn btn-success mx-2">Edit Profile</a>
         <a href="#" id="changePasswordBtn" data-bs-toggle="modal" data-bs-target="#changePasswordModal" class="btn btn-warning mx-2">Change Password</a>
         <a href="#" id="deleteAccountBtn" class="btn btn-danger mx-2">Delete Account</a>
     </div>
 
 </main>
+
+<!-- Top Up Modal -->
+<div class="modal fade" id="topUpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-wallet2"></i> Top Up Balance</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <p class="text-muted mb-1">Current Balance</p>
+                    <h2 class="text-success fw-bold">₱ <?= htmlspecialchars($_SESSION['balance'])?></h2>
+                </div>
+
+                <form action="../processes/process_topup.php" method="POST">
+                    <input type="hidden" name="redirect_to" value="profile"> 
+
+                    <div class="mb-3">
+                        <label for="topupAmount" class="form-label">Amount to Top Up (₱)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
+                            <input type="number" class="form-control" id="topupAmount" name="topup_amount" min="1" step="0.01" placeholder="0.00" required>
+                        </div>
+                        <small class="text-muted">Enter the amount you want to add.</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">
+                            Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Change Password Modal -->
 <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModal" aria-hidden="true">
