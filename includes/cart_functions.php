@@ -53,7 +53,7 @@ function loadCartForUser(mysqli $conn, int $userId): array
     }
 
     $sql = "
-        SELECT ci.item_id, ci.quantity, mi.item_name, mi.price, mp.plan_id, mp.day_of_week, mp.week_start, mp.available_qty, mi.category
+        SELECT ci.item_id, ci.quantity, mi.item_name, mi.price, mi.stock, mp.plan_id, mp.day_of_week, mp.week_start, mp.available_qty, mi.category
         FROM cart_items ci
         JOIN menu_items mi ON ci.item_id = mi.item_id
         LEFT JOIN meal_plans mp ON mp.plan_id = ci.plan_id

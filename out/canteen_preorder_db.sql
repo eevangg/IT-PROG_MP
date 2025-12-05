@@ -864,8 +864,8 @@ CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`cart_items` (
   `quantity` INT(11) NOT NULL DEFAULT 1,
   `subtotal` DECIMAL(10,2) NOT NULL,
   PRIMARY KEY (`cart_item_id`),
-  INDEX `cart_id` (`cart_id` ASC) VISIBLE,
-  INDEX `item_id` (`item_id` ASC) VISIBLE,
+  INDEX `cart_id` (`cart_id` ASC),
+  INDEX `item_id` (`item_id` ASC),
   INDEX `fk_cart_items_meal_plans1_idx` (`plan_id` ASC),
   CONSTRAINT `cart_items_ibfk_1`
     FOREIGN KEY (`cart_id`)

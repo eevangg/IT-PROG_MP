@@ -27,25 +27,19 @@
                 feedback.classList.add('text-success');
                 feedback.textContent = `${result.success}`;
     
-                // Additional logic based on user role
+                const fallbackRedirect = result.role === 'student' ? 'menu.php' : 'admin-pages/dashboard.php';
+                const redirectUrl = result.redirect_url || fallbackRedirect;
+
                 if(result.role === 'admin'){
                     feedback.textContent += ' Redirecting to admin dashboard...';
-                    window.setTimeout(() => {
-                        feedback.textContent  = '';
-                        window.location.href = 'admin-pages/dashboard.php';
-                    }, 2000);
-                }else if(result.role === 'student'){
-                    window.setTimeout(() => {
-                        feedback.textContent  = '';
-                        window.location.href = 'menu.php';
-                    }, 2000);
                 }else if (result.role === 'staff'){
                     feedback.textContent += ' Redirecting to staff dashboard...';
-                    window.setTimeout(() => {
-                        feedback.textContent  = '';
-                        window.location.href = 'admin-pages/dashboard.php';
-                    }, 2000);
                 }
+
+                window.setTimeout(() => {
+                    feedback.textContent  = '';
+                    window.location.href = redirectUrl;
+                }, 2000);
             } else if (result.error) {
                 feedback.textContent = `${result.error}`;
             }

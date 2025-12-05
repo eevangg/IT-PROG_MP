@@ -2,6 +2,30 @@
     session_start();
     include "../config/db.php";
     require_once __DIR__ . '/../includes/cart_functions.php';
+
+    // Derive project path from document root so redirects are absolute within localhost
+    $projectRoot = str_replace('\\', '/', realpath(dirname(__DIR__)));
+    $docRoot = str_replace('\\', '/', rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/'));
+
+    $basePath = '';
+    if ($projectRoot !== false && $docRoot !== '') {
+        $projectLower = strtolower($projectRoot);
+        $docRootLower = strtolower($docRoot);
+        if (strpos($projectLower, $docRootLower) === 0) {
+            $basePath = substr($projectRoot, strlen($docRoot));
+        }
+    }
+
+    $basePath = '/' . ltrim($basePath, '/');
+    if ($basePath === '/') {
+        $basePath = '';
+    }
+
+    $redirectMap = [
+        'admin' => $basePath . '/pages/admin-pages/dashboard.php',
+        'staff' => $basePath . '/pages/admin-pages/dashboard.php',
+        'student' => $basePath . '/pages/menu.php',
+    ];
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = $_POST['loginUsername'];
@@ -39,18 +63,22 @@
                 refreshSessionCart($conn, (int) $user['user_id']);
         
                 // redirect based on role
-                if ($user['user_type'] == 'admin') {
+                $role = 'student';
+                if ($user['user_type'] === 'admin') {
                     $_SESSION['is_admin'] = true;
-                    echo json_encode(['success' => "Login successful!", 'role' => 'admin']);
-                    //header("Location: pages/admin_dashboard.php");
-                } elseif ($user['user_type'] == 'staff') {
+                    $role = 'admin';
+                } elseif ($user['user_type'] === 'staff') {
                     $_SESSION['is_staff'] = true;
-                    echo json_encode(['success' => "Login successful!", 'role' => 'staff']);
-                    //header("Location: pages/staff_dashboard.php");
-                } else {
-                    echo json_encode(['success' => "Login successful!", 'role' => 'student']);
-                    //header("Location: pages/student_dashboard.php");
+                    $role = 'staff';
                 }
+
+                $redirectUrl = $redirectMap[$role] ?? $redirectMap['student'];
+
+                echo json_encode([
+                    'success' => "Login successful!",
+                    'role' => $role,
+                    'redirect_url' => $redirectUrl
+                ]);
                 $stmt->close();
                 $conn->close();
                 exit;
