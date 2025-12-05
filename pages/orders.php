@@ -14,7 +14,17 @@ include('../includes/header.php');
   <?php endif; ?>
 
   <?php
-    $cartItems = $_SESSION['cart'] ?? [];
+    $cartItems = [];
+
+    if (!empty($_SESSION['cart'])) {
+        foreach ($_SESSION['cart'] as $itemId => $plans) {
+            foreach ($plans as $planId => $itemData) {
+                // Add plan_id inside itemData for convenience
+                $itemData['plan_id'] = $planId;
+                $cartItems[] = $itemData;
+            }
+        }
+    }
     $cartTotal = 0;
     $accountBalance = isset($_SESSION['balance']) ? (float) $_SESSION['balance'] : 0;
   ?>
@@ -45,12 +55,14 @@ include('../includes/header.php');
               <h5 class="card-title mb-1"><?= htmlspecialchars($item['name']) ?></h5>
               <p class="mb-1 text-muted">Price: &#8369;<?= number_format($item['price'], 2) ?></p>
               <p class="mb-1">Subtotal: <strong>&#8369;<?= number_format($itemTotal, 2) ?></strong></p>
-              <p class="mb-0 text-muted">Available stock: <?= (int) $item['stock'] ?></p>
+              <p class="mb-0 text-muted">Available Quantity: <?= (int) $item['stock'] ?></p>
+              <p class="mb-0 text-muted">Meal For: <?= $item['date'] ?> (<?= $item['day'] ?>)</p>
             </div>
             <div class="d-flex flex-column gap-2 mt-3 mt-sm-0">
               <form action="../processes/process_menu.php" method="POST" class="d-flex align-items-center gap-2">
                 <input type="hidden" name="action" value="update_quantity">
                 <input type="hidden" name="item_id" value="<?= (int) $item['item_id'] ?>">
+                <input type="hidden" name="plan_id" value="<?= (int) $item['plan_id'] ?>">
                 <input type="hidden" name="redirect" value="../pages/orders.php">
                 <label class="form-label mb-0 small">Qty</label>
                 <input type="number" name="quantity" class="form-control" style="width: 90px;" min="0" max="<?= (int) $item['stock'] ?>" value="<?= (int) $item['quantity'] ?>">
@@ -59,6 +71,7 @@ include('../includes/header.php');
               <form action="../processes/process_menu.php" method="POST">
                 <input type="hidden" name="action" value="remove_item">
                 <input type="hidden" name="item_id" value="<?= (int) $item['item_id'] ?>">
+                <input type="hidden" name="plan_id" value="<?= (int) $item['plan_id'] ?>">
                 <input type="hidden" name="redirect" value="../pages/orders.php">
                 <button type="submit" class="btn btn-outline-danger btn-sm w-100">Remove</button>
               </form>

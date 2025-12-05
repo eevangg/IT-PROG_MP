@@ -58,11 +58,11 @@ switch ($action) {
         }
 
         if ((int) $item['available_qty'] <= 0) {
-            setCartFeedback('danger', 'This item is currently out of stock.');
+            setCartFeedback('danger', 'This item is currently unavailable for the chosen day.');
             break;
         }
 
-        $existingQty = isset($_SESSION['cart'][$itemId]) ? (int) $_SESSION['cart'][$itemId]['quantity'] : 0;
+        $existingQty = isset($_SESSION['cart'][$itemId][$planId]) ? (int) $_SESSION['cart'][$itemId][$planId]['quantity'] : 0;
         $maxAllowed = (int) $item['available_qty'];
         $newQty = min($existingQty + $quantity, $maxAllowed);
 
@@ -74,8 +74,8 @@ switch ($action) {
 
         $subtotal = (float) $item['price'] * $newQty;
 
-        $itemStmt = $conn->prepare("SELECT cart_item_id FROM cart_items WHERE cart_id = ? AND item_id = ?");
-        $itemStmt->bind_param("ii", $cartId, $itemId);
+        $itemStmt = $conn->prepare("SELECT cart_item_id FROM cart_items WHERE cart_id = ? AND item_id = ? AND plan_id = ?");
+        $itemStmt->bind_param("iii", $cartId, $itemId, $planId);
         $itemStmt->execute();
         $existingItem = $itemStmt->get_result()->fetch_assoc();
         $itemStmt->close();
@@ -94,12 +94,12 @@ switch ($action) {
             }
             $updateStmt->close();
         } else {
-            $insertStmt = $conn->prepare("INSERT INTO cart_items (cart_id, item_id, quantity, subtotal) VALUES (?, ?, ?, ?)");
+            $insertStmt = $conn->prepare("INSERT INTO cart_items (cart_id, plan_id, item_id, quantity, subtotal) VALUES (?, ?, ?, ?, ?)");
             if (!$insertStmt) {
                 setCartFeedback('danger', 'Unable to add the item to your cart right now.');
                 break;
             }
-            $insertStmt->bind_param("iiid", $cartId, $itemId, $newQty, $subtotal);
+            $insertStmt->bind_param("iiiid", $cartId, $planId, $itemId, $newQty, $subtotal);
             if (!$insertStmt->execute()) {
                 $insertStmt->close();
                 setCartFeedback('danger', 'Unable to add the item to your cart right now.');
@@ -112,15 +112,16 @@ switch ($action) {
 
         $message = $newQty === ($existingQty + $quantity)
             ? "{$item['item_name']} added to your cart."
-            : "Quantity updated. Maximum available stock is {$item['stock']}.";
+            : "Quantity updated. Maximum available quantity is {$item['available_qty']}.";
         setCartFeedback('success', $message);
         break;
 
     case 'update_quantity':
         $itemId = isset($_POST['item_id']) ? (int) $_POST['item_id'] : 0;
         $quantity = isset($_POST['quantity']) ? (int) $_POST['quantity'] : 1;
+        $planId = isset($_POST['plan_id']) ? (int) $_POST['plan_id'] : 0;
 
-        if (!isset($_SESSION['cart'][$itemId])) {
+        if (!isset($_SESSION['cart'][$itemId][$planId])) {
             setCartFeedback('danger', 'Item not found in cart.');
             break;
         }
@@ -132,9 +133,9 @@ switch ($action) {
         }
 
         if ($quantity <= 0) {
-            $removeStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ? AND item_id = ?");
+            $removeStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ? AND item_id = ? AND plan_id = ?");
             if ($removeStmt) {
-                $removeStmt->bind_param("ii", $cartId, $itemId);
+                $removeStmt->bind_param("iii", $cartId, $itemId, $planId);
                 $removeStmt->execute();
                 $removeStmt->close();
             }
@@ -143,16 +144,20 @@ switch ($action) {
             break;
         }
 
-        $stmt = $conn->prepare("SELECT price, stock FROM menu_items WHERE item_id = ? AND status = 'active'");
-        $stmt->bind_param("i", $itemId);
+        $sql = "SELECT m.price, mp.available_qty 
+                FROM menu_items m
+                JOIN meal_plans mp ON m.item_id = mp.item_id
+                WHERE m.item_id = ? AND mp.plan_id = ? AND m.status = 'active'";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $itemId, $planId);
         $stmt->execute();
         $item = $stmt->get_result()->fetch_assoc();
         $stmt->close();
 
         if (!$item) {
-            $cleanupStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ? AND item_id = ?");
+            $cleanupStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ? AND item_id = ? AND plan_id = ?");
             if ($cleanupStmt) {
-                $cleanupStmt->bind_param("ii", $cartId, $itemId);
+                $cleanupStmt->bind_param("iii", $cartId, $itemId, $planId);
                 $cleanupStmt->execute();
                 $cleanupStmt->close();
             }
@@ -161,17 +166,17 @@ switch ($action) {
             break;
         }
 
-        $maxAllowed = (int) $item['stock'];
+        $maxAllowed = (int) $item['available_qty'];
         $newQty = min($quantity, $maxAllowed);
 
         $subtotal = (float) $item['price'] * $newQty;
-        $updateStmt = $conn->prepare("UPDATE cart_items SET quantity = ?, subtotal = ? WHERE cart_id = ? AND item_id = ?");
+        $updateStmt = $conn->prepare("UPDATE cart_items SET quantity = ?, subtotal = ? WHERE cart_id = ? AND item_id = ? AND plan_id = ?");
         if (!$updateStmt) {
             setCartFeedback('danger', 'Unable to update your cart. Please try again.');
             break;
         }
 
-        $updateStmt->bind_param("idii", $newQty, $subtotal, $cartId, $itemId);
+        $updateStmt->bind_param("idiii", $newQty, $subtotal, $cartId, $itemId, $planId);
         if (!$updateStmt->execute()) {
             $updateStmt->close();
             setCartFeedback('danger', 'Unable to update your cart. Please try again.');
@@ -183,7 +188,7 @@ switch ($action) {
 
         $feedbackType = $quantity > $maxAllowed ? 'warning' : 'success';
         $message = $quantity > $maxAllowed
-            ? "Quantity adjusted to available stock ({$item['stock']})."
+            ? "Quantity adjusted to available quantity ({$item['available_qty']})."
             : "Quantity updated.";
         setCartFeedback($feedbackType, $message);
         break;
@@ -191,11 +196,12 @@ switch ($action) {
     case 'remove_item':
         $itemId = isset($_POST['item_id']) ? (int) $_POST['item_id'] : 0;
         $cartId = getOrCreateUserCartId($conn, $userId);
-        $hadItem = isset($_SESSION['cart'][$itemId]);
+        $planId = isset($_POST['plan_id']) ? (int) $_POST['plan_id'] : 0;
+        $hadItem = isset($_SESSION['cart'][$itemId][$planId]);
         if ($cartId) {
-            $removeStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ? AND item_id = ?");
+            $removeStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ? AND item_id = ? AND plan_id = ?");
             if ($removeStmt) {
-                $removeStmt->bind_param("ii", $cartId, $itemId);
+                $removeStmt->bind_param("iii", $cartId, $itemId, $planId);
                 $removeStmt->execute();
                 $removeStmt->close();
             }

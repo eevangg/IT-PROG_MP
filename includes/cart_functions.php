@@ -71,12 +71,42 @@ function loadCartForUser(mysqli $conn, int $userId): array
     $result = $stmt->get_result();
     while ($row = $result->fetch_assoc()) {
         $itemId = (int) $row['item_id'];
-        $cartData[$itemId] = [
+        $planId = (int) $row['plan_id'];
+
+        // Convert day string → number
+        $dayName = $row['day_of_week'];
+        $weekStart = $row['week_start'];
+
+        $dayMap = [
+            "Monday"    => 1,
+            "Tuesday"   => 2,
+            "Wednesday" => 3,
+            "Thursday"  => 4,
+            "Friday"    => 5,
+            "Saturday"  => 6,
+            "Sunday"    => 7
+        ];
+
+        // Safeguard: If day is missing or invalid, assume Monday
+        $dayNumber = $dayMap[$dayName] ?? 1;
+
+        // Calculate the exact date
+        $exactDate = date(
+            'Y-m-d',
+            strtotime("$weekStart + " . ($dayNumber - 1) . " days")
+        );
+
+        $cartData[$itemId][$planId] = [
             'item_id' => $itemId,
+            'plan_id' => $planId,
             'name' => $row['item_name'],
             'price' => (float) $row['price'],
-            'stock' => (int) $row['stock'],
+            'stock' => (int) $row['available_qty'],
             'quantity' => (int) $row['quantity'],
+            'category' => $row['category'],
+            'week' => $row['week_start'],
+            'day' =>  $row['day_of_week'],
+            'date' => $exactDate
         ];
     }
     $stmt->close();
