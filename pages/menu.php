@@ -63,24 +63,49 @@ include('../includes/header.php');
   
       $weeklyMeals = [];
       $categories = [];
+      $days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+
       while ($row = $menuResult->fetch_assoc()) {
-          $weeklyMeals[$row['day_of_week']][] = $row;
+          if (in_array($row['day_of_week'], $days)) {
+              $weeklyMeals[$row['day_of_week']][] = $row;
+          }
           if (!in_array($row['category'], $categories)) {
               $categories[] = $row['category'];
           }
       }
 
-      $days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+      if (isset($_GET['day']) && in_array($_GET['day'], $days)) {
+        $selectedDay = $_GET['day'];
+      } else {
+        $selectedDay = 'Monday';
+      }
     ?>
 
-    <?php foreach ($days as $day): ?>
-        <h3 class='mt-4'><?= $day ?></h3>
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <h3>Menu for <span class="text-primary"><?= $selectedDay ?></span></h3>
+        
+        <form method="GET" action="">
+            <label class="me-2">Select Day:</label>
+            <select name="day" class="form-select d-inline-block w-auto" onchange="this.form.submit()">
+                <?php foreach ($days as $dayOption): ?>
+                    <option value="<?= $dayOption ?>" <?= $dayOption == $selectedDay ? 'selected' : '' ?>>
+                        <?= $dayOption ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </form>
+    </div>
 
-      <div class="row g-2">
-      <?php if (!empty($weeklyMeals[$day])): ?>
-        <?php foreach ($weeklyMeals[$day] as $item): ?> 
+    <div class="row g-2 mt-3">
+      <?php if (!empty($weeklyMeals[$selectedDay])): ?>
+        
+        <?php foreach ($weeklyMeals[$selectedDay] as $item): ?> 
               <div class="col-md-3">
-                <div class="card menu-cards d-flex flex-column h-100" data-name="<?= strtolower($item['item_name']) ?>" data-category="<?= $item['category'] ?>" data-price="<?= $item['price'] ?>">
+                <div class="card menu-cards d-flex flex-column h-100" 
+                     data-name="<?= strtolower($item['item_name']) ?>" 
+                     data-category="<?= $item['category'] ?>" 
+                     data-price="<?= $item['price'] ?>">
+                     
                   <img src="../assets/images/menu_items/<?= $item['image']?>" class="card-img-top" alt="">
                   <div class="card-body d-flex flex-column">
                     <h5 class="card-title"><?= $item['item_name'] ?></h5>
@@ -94,7 +119,8 @@ include('../includes/header.php');
                           <input type="hidden" name="action" value="add_to_cart">
                           <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
                           <input type="hidden" name="plan_id" value="<?= $item['plan_id'] ?>">
-                          <input type="hidden" name="redirect" value="../pages/menu.php">
+                          <input type="hidden" name="redirect" value="../pages/menu.php?day=<?= $selectedDay ?>">
+                          
                           <div class="input-group">
                             <span class="input-group-text">Qty</span>
                             <input type="number" name="quantity" class="form-control" min="1" max="<?= $item['available_qty'] ?>" value="1" required>
@@ -108,13 +134,14 @@ include('../includes/header.php');
                 </div>
               </div>
         <?php endforeach; ?>
+      
       <?php else: ?>
-        <div>
-          <p>No meals planned for this day.</p>
+        <div class="col-12">
+          <div class="alert alert-info">No meals planned for <?= $selectedDay ?>.</div>
         </div>
       <?php endif; ?>
-      </div>
-    <?php endforeach; ?>
+    </div>
+    
     <?php $conn->close(); ?>
       
   </div>
