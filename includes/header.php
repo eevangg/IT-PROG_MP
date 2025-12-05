@@ -7,6 +7,19 @@ if (!isset($_SESSION['username'])) {
   header("Location: ../pages/login.php");
   exit();
 }
+
+require_once __DIR__ . '/cart_functions.php';
+
+if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
+  $_SESSION['cart'] = [];
+}
+
+$cartLoaded = isset($_SESSION['cart_loaded_from_db']) && $_SESSION['cart_loaded_from_db'] === true;
+if (isset($_SESSION['user_id']) && !$cartLoaded) {
+  require_once __DIR__ . '/../config/db.php';
+  ensureSessionCartInitialized($conn, (int) $_SESSION['user_id']);
+  $conn->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -66,9 +79,9 @@ if (!isset($_SESSION['username'])) {
               <?php if (isset($_SESSION['username'])): ?>
                 <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                 <li><a class="dropdown-item" href="../processes/logout.php">Logout</a></li>
-                <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                <?php if ((isset($_SESSION['is_admin']) && $_SESSION['is_admin']) || (isset($_SESSION['is_staff']) && $_SESSION['is_staff'])): ?>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="admin-pages/dashboard.php">Admin Dashboard</a></li>
+                  <li><a class="dropdown-item" href="admin-pages/dashboard.php">Management Dashboard</a></li>
                 <?php endif; ?>
               <?php else: ?>
                 <li><a class="dropdown-item" href="login.php">Sign In</a></li>

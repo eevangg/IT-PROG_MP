@@ -1,8 +1,8 @@
 
 <?php
-session_start();
-$pageTitle = "Admin Dashboard - ArcherInnov Canteen Pre-order System";
-include('../../includes/sidebar.php'); 
+  session_start();
+  $pageTitle = "Management Dashboard - ArcherInnov Canteen Pre-order System";
+  include('../../includes/sidebar.php'); 
 ?>
 
 <main class="admin-content container my-5 fullHeight d-flex flex-column align-items-center justify-content-start">
@@ -15,7 +15,7 @@ include('../../includes/sidebar.php');
         <i class="bi bi-house-door me-1"></i> Home
       </a>
     </div>
-    <h1 class="text-center flex-grow-1 fw-bold text-success">Admin Dashboard</h1>
+    <h1 class="text-center flex-grow-1 fw-bold text-success">Management Dashboard</h1>
     <a href="../../processes/logout.php" class="btn btn-outline-success btn-sm shadow-sm logoutButton">Logout</a>
   </div>
 
@@ -81,8 +81,10 @@ include('../../includes/sidebar.php');
       <a href="manage_orders.php" class="btn btn-success mx-2">Manage Orders</a>
       <a href="manage_menu.php" class="btn btn-success mx-2">Manage Menu</a>
       <a href="manage_meal_plans.php" class="btn btn-success mx-2">Meal Plans</a>
-      <a href="manage_users.php" class="btn btn-success mx-2">User Management</a>
-      <a href="reports.php" class="btn btn-success mx-2">View Reports</a>
+      <?php if (isset($_SESSION['is_admin'])): ?>
+        <a href="manage_users.php" class="btn btn-success mx-2">User Management</a>
+        <a href="reports.php" class="btn btn-success mx-2">View Reports</a>
+      <?php endif; ?>
     </div>
   </div>
 

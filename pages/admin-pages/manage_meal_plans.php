@@ -87,7 +87,9 @@
                 <div class="text-muted small mb-1">Quick Links</div>
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="dashboard.php" class="btn btn-outline-success btn-sm"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
-                    <a href="manage_users.php" class="btn btn-outline-success btn-sm"><i class="bi bi-people me-1"></i>Manage Users</a>
+                    <?php if (isset($_SESSION['is_admin'])) : ?>
+                        <a href="manage_users.php" class="btn btn-outline-success btn-sm"><i class="bi bi-people me-1"></i>Manage Users</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
