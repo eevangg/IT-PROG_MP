@@ -176,10 +176,13 @@
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="agree" name="agree" required>
                         <label class="form-check-label" for="agree">
-                            <small>I agree to the terms and conditions</small>
+                            <small>
+                                I agree to the terms and conditions.
+                                <a href="sample_terms.php" class="text-decoration-underline ms-1" target="_blank" rel="noopener">View T&C</a>
+                            </small>
                         </label>
                     </div>
-
+                        
                     <button type="submit" class="btn btn-success w-100 btn-lg" id="checkoutBtn">
                         <i class="bi bi-check-circle"></i> Complete Order
                     </button>

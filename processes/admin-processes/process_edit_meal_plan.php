@@ -1,4 +1,5 @@
 <?php
+    // Admin edits to existing meal plans, including Monday guard for week start dates.
     session_start();
 
     include('../../config/db.php');

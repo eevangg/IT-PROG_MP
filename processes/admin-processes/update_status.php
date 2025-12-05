@@ -1,19 +1,19 @@
 <?php
+    // Admin status updater for payments, orders, items, and meal plans via JSON payloads.
     session_start();
     // Include database configuration 
     include('../../config/db.php');
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $raw = file_get_contents("php://input");
-
         $data = json_decode($raw, true);
 
-        $id = $data['id'];
-        $status = $data['status'];
-        $paymentStatus = $data['payment_status'] ;
-        $itemStatus = $data['item_status'];
-        $planStatus = $data['plan_status'];
-        $type = $data['type'];
+        $id = isset($data['id']) ? intval($data['id']) : 0;
+        $status = $data['status'] ?? null;
+        $paymentStatus = $data['payment_status'] ?? null;
+        $itemStatus = $data['item_status'] ?? null;
+        $planStatus = $data['plan_status'] ?? null;
+        $type = $data['type'] ?? null;
 
         // Validate inputs
         if (empty($id) || empty($type)) {
@@ -27,18 +27,53 @@
                 exit();
             }
 
-            // Update payment status in the database
-            $updatePaymentQuery = "UPDATE payments SET payment_status = ? WHERE order_id = ?";
-            $stmtPayment = $conn->prepare($updatePaymentQuery);
-            $stmtPayment->bind_param("si", $paymentStatus, $id);
+            // Pull order info so we can upsert into payments if the record is missing.
+            $orderSql = "SELECT payment_method, total_amount FROM orders WHERE order_id = ?";
+            $orderStmt = $conn->prepare($orderSql);
+            $orderStmt->bind_param("i", $id);
+            $orderStmt->execute();
+            $orderResult = $orderStmt->get_result();
+            $order = $orderResult->fetch_assoc();
+            $orderStmt->close();
 
-            if ($stmtPayment->execute()) {
+            if (!$order) {
+                echo json_encode(['status' => 'error', 'message' => 'Order not found.']);
+                $conn->close();
+                exit();
+            }
+
+            // Check if a payment row already exists; if not, insert one so updates always stick.
+            $existingPayment = null;
+            $checkSql = "SELECT payment_id FROM payments WHERE order_id = ?";
+            $checkStmt = $conn->prepare($checkSql);
+            $checkStmt->bind_param("i", $id);
+            $checkStmt->execute();
+            $checkResult = $checkStmt->get_result();
+            if ($checkResult->num_rows > 0) {
+                $existingPayment = $checkResult->fetch_assoc();
+            }
+            $checkStmt->close();
+
+            if ($existingPayment) {
+                $updatePaymentQuery = "UPDATE payments SET payment_status = ? WHERE order_id = ?";
+                $stmtPayment = $conn->prepare($updatePaymentQuery);
+                $stmtPayment->bind_param("si", $paymentStatus, $id);
+                $ok = $stmtPayment->execute();
+                $stmtPayment->close();
+            } else {
+                $insertPaymentQuery = "INSERT INTO payments (order_id, payment_method, amount_paid, payment_status) VALUES (?, ?, ?, ?)";
+                $stmtPayment = $conn->prepare($insertPaymentQuery);
+                $stmtPayment->bind_param("isds", $id, $order['payment_method'], $order['total_amount'], $paymentStatus);
+                $ok = $stmtPayment->execute();
+                $stmtPayment->close();
+            }
+
+            if ($ok) {
                 echo json_encode(['status' => 'success', 'message' => 'Payment status updated successfully.']);
             } else {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to update payment status. Please try again later.']);
             }
 
-            $stmtPayment->close();
             $conn->close();
             exit();
         }else if ($type === 'status') {

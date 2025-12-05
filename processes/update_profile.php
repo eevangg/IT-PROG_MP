@@ -1,4 +1,5 @@
 <?php
+// Update a user's profile details with validation and session refresh.
 session_start();
 include('../config/db.php');
 

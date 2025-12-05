@@ -1,4 +1,5 @@
 <?php
+    // Soft-delete the current user account and end the session.
     session_start();
     include("../config/db.php");
 

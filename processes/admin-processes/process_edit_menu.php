@@ -1,4 +1,5 @@
 <?php
+    // Admin edits to menu items with optional image replacement.
     session_start();
 
     include('../../config/db.php');

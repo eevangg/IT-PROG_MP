@@ -1,4 +1,5 @@
 <?php
+    // Authenticate users, hydrate their session (cart included), and return a role-specific redirect target.
     session_start();
     include "../config/db.php";
     require_once __DIR__ . '/../includes/cart_functions.php';
@@ -21,6 +22,7 @@
         $basePath = '';
     }
 
+    // Central redirect destinations keyed by resolved role
     $redirectMap = [
         'admin' => $basePath . '/pages/admin-pages/dashboard.php',
         'staff' => $basePath . '/pages/admin-pages/dashboard.php',
@@ -60,6 +62,7 @@
                 $_SESSION['balance'] = $user['balance'];
                 $_SESSION['member'] = $user['date_created'];
 
+                // Ensure session cart mirrors current DB cart after authentication
                 refreshSessionCart($conn, (int) $user['user_id']);
         
                 // redirect based on role

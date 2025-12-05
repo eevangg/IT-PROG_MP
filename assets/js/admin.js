@@ -251,6 +251,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // Universal table filter
     document.querySelectorAll('[data-table]').forEach(input => {
+        if (input.id === 'orderFilter') return; // custom logic below focuses on order id
+
         input.addEventListener('keyup', function () {
             const query   = this.value.toLowerCase();
             const tableId = this.dataset.table;
@@ -262,6 +264,27 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // Order filter: prioritize matching the first column (Order ID), but allow fallback text search for non-numeric queries.
+    const orderFilter = document.getElementById('orderFilter');
+    if (orderFilter) {
+        orderFilter.addEventListener('keyup', function () {
+            const query = this.value.trim().toLowerCase();
+            const rows = document.querySelectorAll('#ordersTable tr');
+            const numericQuery = /^\d+$/.test(query);
+
+            rows.forEach(row => {
+                const firstCell = row.querySelector('td');
+                const idText = firstCell ? firstCell.textContent.toLowerCase() : '';
+                const rowText = row.textContent.toLowerCase();
+
+                const matchesId = query === '' || idText.includes(query);
+                const matchesFallback = !numericQuery && rowText.includes(query);
+
+                row.style.display = (matchesId || matchesFallback) ? '' : 'none';
+            });
+        });
+    }
 
 
     // Handle delete order and delete menu item
@@ -606,6 +629,55 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 console.error('Error:', error);
                 showToast('An error occurred while creating the user.', false);
+            }
+        });
+    }
+
+    const editUserForm = document.getElementById("editUserForm");
+    if (editUserForm) {
+        editUserForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            // Only validate password fields when the admin wants to change it.
+            const newPassword = document.getElementById("new_password").value;
+            const confirmPassword = document.getElementById("confirm_new_password").value;
+            if (newPassword || confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    document.getElementById("confirm_new_password").setCustomValidity("Passwords do not match.");
+                } else {
+                    document.getElementById("confirm_new_password").setCustomValidity("");
+                }
+            } else {
+                document.getElementById("confirm_new_password").setCustomValidity("");
+            }
+
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add("was-validated");
+                return;
+            }
+
+            const formData = new FormData(editUserForm);
+
+            try {
+                const response = await fetch("../../processes/admin-processes/process_edit_user.php", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.status === "success") {
+                    showToast(data.message, true);
+                    setTimeout(() => {
+                        window.location.href = "manage_users.php";
+                    }, 800);
+                } else {
+                    showToast(data.message, false);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showToast("An error occurred while updating the user.", false);
             }
         });
     }

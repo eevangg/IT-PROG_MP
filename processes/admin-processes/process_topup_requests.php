@@ -1,4 +1,5 @@
 <?php
+    // Admin processing of wallet top-up requests (approve or reject with balance updates).
     // processes/process_admin_topup.php
     session_start();
     include('../../config/db.php');

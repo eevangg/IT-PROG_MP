@@ -1,4 +1,5 @@
 <?php
+// Admin endpoint to confirm or cancel payments, optionally refunding wallet orders inside a transaction.
 session_start();
 
 // Check if user is admin

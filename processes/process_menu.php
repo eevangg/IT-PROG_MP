@@ -1,4 +1,5 @@
 <?php
+// Central handler for cart actions (add/update/remove/clear) with session+database sync and safe redirects.
 session_start();
 
 if (!isset($_SESSION['username'])) {
@@ -17,6 +18,7 @@ require_once __DIR__ . '/../includes/cart_functions.php';
 $userId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 0;
 ensureSessionCartInitialized($conn, $userId);
 
+// Limit redirect targets so we never send users to arbitrary URLs.
 $allowedRedirects = [
     '../pages/menu.php',
     '../pages/orders.php'
