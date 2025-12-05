@@ -80,7 +80,7 @@ include('../includes/header.php');
             <input type="hidden" name="redirect" value="../pages/orders.php">
             <button type="submit" class="btn btn-outline-secondary">Clear Cart</button>
           </form>
-          <button class="btn btn-success" type="button" disabled>Proceed to Checkout</button>
+          <a href="checkout.php" class="btn btn-success">Proceed to Checkout</a>
         </div>
       </div>
     </div>
