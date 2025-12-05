@@ -39,9 +39,15 @@ switch ($action) {
     case 'add_to_cart':
         $itemId = isset($_POST['item_id']) ? (int) $_POST['item_id'] : 0;
         $quantity = isset($_POST['quantity']) ? max(1, (int) $_POST['quantity']) : 1;
+        $planId = isset($_POST['plan_id']) ? (int) $_POST['plan_id'] : 0;
 
-        $stmt = $conn->prepare("SELECT item_id, item_name, price, stock FROM menu_items WHERE item_id = ? AND status = 'active'");
-        $stmt->bind_param("i", $itemId);
+        $sql = "SELECT m.item_id, m.item_name, m.price, mp.available_qty 
+                FROM menu_items m
+                JOIN meal_plans mp ON m.item_id = mp.item_id
+                WHERE m.item_id = ? AND mp.plan_id = ? AND m.status = 'active'";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $itemId, $planId);
         $stmt->execute();
         $item = $stmt->get_result()->fetch_assoc();
         $stmt->close();
@@ -51,13 +57,13 @@ switch ($action) {
             break;
         }
 
-        if ((int) $item['stock'] <= 0) {
+        if ((int) $item['available_qty'] <= 0) {
             setCartFeedback('danger', 'This item is currently out of stock.');
             break;
         }
 
         $existingQty = isset($_SESSION['cart'][$itemId]) ? (int) $_SESSION['cart'][$itemId]['quantity'] : 0;
-        $maxAllowed = (int) $item['stock'];
+        $maxAllowed = (int) $item['available_qty'];
         $newQty = min($existingQty + $quantity, $maxAllowed);
 
         $cartId = getOrCreateUserCartId($conn, $userId);
