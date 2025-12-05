@@ -1,6 +1,7 @@
 <?php
     session_start();
     include "../config/db.php";
+    require_once __DIR__ . '/../includes/cart_functions.php';
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = $_POST['loginUsername'];
@@ -34,6 +35,8 @@
                 $_SESSION['role'] = $user['user_type'];
                 $_SESSION['balance'] = $user['balance'];
                 $_SESSION['member'] = $user['date_created'];
+
+                refreshSessionCart($conn, (int) $user['user_id']);
         
                 // redirect based on role
                 if ($user['user_type'] == 'admin') {

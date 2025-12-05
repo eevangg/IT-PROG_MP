@@ -12,10 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 include "../config/db.php";
+require_once __DIR__ . '/../includes/cart_functions.php';
 
-if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
+$userId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 0;
+ensureSessionCartInitialized($conn, $userId);
 
 $allowedRedirects = [
     '../pages/menu.php',
@@ -60,13 +60,49 @@ switch ($action) {
         $maxAllowed = (int) $item['stock'];
         $newQty = min($existingQty + $quantity, $maxAllowed);
 
-        $_SESSION['cart'][$itemId] = [
-            'item_id' => $item['item_id'],
-            'name' => $item['item_name'],
-            'price' => $item['price'],
-            'stock' => $item['stock'],
-            'quantity' => $newQty
-        ];
+        $cartId = getOrCreateUserCartId($conn, $userId);
+        if (!$cartId) {
+            setCartFeedback('danger', 'Unable to access your cart at the moment. Please try again.');
+            break;
+        }
+
+        $subtotal = (float) $item['price'] * $newQty;
+
+        $itemStmt = $conn->prepare("SELECT cart_item_id FROM cart_items WHERE cart_id = ? AND item_id = ?");
+        $itemStmt->bind_param("ii", $cartId, $itemId);
+        $itemStmt->execute();
+        $existingItem = $itemStmt->get_result()->fetch_assoc();
+        $itemStmt->close();
+
+        if ($existingItem) {
+            $updateStmt = $conn->prepare("UPDATE cart_items SET quantity = ?, subtotal = ? WHERE cart_item_id = ?");
+            if (!$updateStmt) {
+                setCartFeedback('danger', 'Unable to update your cart. Please try again.');
+                break;
+            }
+            $updateStmt->bind_param("idi", $newQty, $subtotal, $existingItem['cart_item_id']);
+            if (!$updateStmt->execute()) {
+                $updateStmt->close();
+                setCartFeedback('danger', 'Unable to update your cart. Please try again.');
+                break;
+            }
+            $updateStmt->close();
+        } else {
+            $insertStmt = $conn->prepare("INSERT INTO cart_items (cart_id, item_id, quantity, subtotal) VALUES (?, ?, ?, ?)");
+            if (!$insertStmt) {
+                setCartFeedback('danger', 'Unable to add the item to your cart right now.');
+                break;
+            }
+            $insertStmt->bind_param("iiid", $cartId, $itemId, $newQty, $subtotal);
+            if (!$insertStmt->execute()) {
+                $insertStmt->close();
+                setCartFeedback('danger', 'Unable to add the item to your cart right now.');
+                break;
+            }
+            $insertStmt->close();
+        }
+
+        refreshSessionCart($conn, $userId);
 
         $message = $newQty === ($existingQty + $quantity)
             ? "{$item['item_name']} added to your cart."
@@ -83,28 +119,61 @@ switch ($action) {
             break;
         }
 
+        $cartId = getOrCreateUserCartId($conn, $userId);
+        if (!$cartId) {
+            setCartFeedback('danger', 'Unable to update your cart at the moment.');
+            break;
+        }
+
         if ($quantity <= 0) {
-            unset($_SESSION['cart'][$itemId]);
+            $removeStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ? AND item_id = ?");
+            if ($removeStmt) {
+                $removeStmt->bind_param("ii", $cartId, $itemId);
+                $removeStmt->execute();
+                $removeStmt->close();
+            }
+            refreshSessionCart($conn, $userId);
             setCartFeedback('success', 'Item removed from your cart.');
             break;
         }
 
-        $stmt = $conn->prepare("SELECT stock FROM menu_items WHERE item_id = ? AND status = 'active'");
+        $stmt = $conn->prepare("SELECT price, stock FROM menu_items WHERE item_id = ? AND status = 'active'");
         $stmt->bind_param("i", $itemId);
         $stmt->execute();
         $item = $stmt->get_result()->fetch_assoc();
         $stmt->close();
 
         if (!$item) {
-            unset($_SESSION['cart'][$itemId]);
+            $cleanupStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ? AND item_id = ?");
+            if ($cleanupStmt) {
+                $cleanupStmt->bind_param("ii", $cartId, $itemId);
+                $cleanupStmt->execute();
+                $cleanupStmt->close();
+            }
+            refreshSessionCart($conn, $userId);
             setCartFeedback('danger', 'Item is no longer available and was removed from your cart.');
             break;
         }
 
         $maxAllowed = (int) $item['stock'];
         $newQty = min($quantity, $maxAllowed);
-        $_SESSION['cart'][$itemId]['quantity'] = $newQty;
-        $_SESSION['cart'][$itemId]['stock'] = $item['stock'];
+
+        $subtotal = (float) $item['price'] * $newQty;
+        $updateStmt = $conn->prepare("UPDATE cart_items SET quantity = ?, subtotal = ? WHERE cart_id = ? AND item_id = ?");
+        if (!$updateStmt) {
+            setCartFeedback('danger', 'Unable to update your cart. Please try again.');
+            break;
+        }
+
+        $updateStmt->bind_param("idii", $newQty, $subtotal, $cartId, $itemId);
+        if (!$updateStmt->execute()) {
+            $updateStmt->close();
+            setCartFeedback('danger', 'Unable to update your cart. Please try again.');
+            break;
+        }
+        $updateStmt->close();
+
+        refreshSessionCart($conn, $userId);
 
         $feedbackType = $quantity > $maxAllowed ? 'warning' : 'success';
         $message = $quantity > $maxAllowed
@@ -115,8 +184,18 @@ switch ($action) {
 
     case 'remove_item':
         $itemId = isset($_POST['item_id']) ? (int) $_POST['item_id'] : 0;
-        if (isset($_SESSION['cart'][$itemId])) {
-            unset($_SESSION['cart'][$itemId]);
+        $cartId = getOrCreateUserCartId($conn, $userId);
+        $hadItem = isset($_SESSION['cart'][$itemId]);
+        if ($cartId) {
+            $removeStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ? AND item_id = ?");
+            if ($removeStmt) {
+                $removeStmt->bind_param("ii", $cartId, $itemId);
+                $removeStmt->execute();
+                $removeStmt->close();
+            }
+        }
+        refreshSessionCart($conn, $userId);
+        if ($hadItem) {
             setCartFeedback('success', 'Item removed from your cart.');
         } else {
             setCartFeedback('danger', 'Item not found in cart.');
@@ -124,7 +203,16 @@ switch ($action) {
         break;
 
     case 'clear_cart':
-        unset($_SESSION['cart']);
+        $cartId = getOrCreateUserCartId($conn, $userId);
+        if ($cartId) {
+            $clearStmt = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ?");
+            if ($clearStmt) {
+                $clearStmt->bind_param("i", $cartId);
+                $clearStmt->execute();
+                $clearStmt->close();
+            }
+        }
+        refreshSessionCart($conn, $userId);
         setCartFeedback('success', 'Cart cleared.');
         break;
 

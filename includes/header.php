@@ -7,6 +7,19 @@ if (!isset($_SESSION['username'])) {
   header("Location: ../pages/login.php");
   exit();
 }
+
+require_once __DIR__ . '/cart_functions.php';
+
+if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
+  $_SESSION['cart'] = [];
+}
+
+$cartLoaded = isset($_SESSION['cart_loaded_from_db']) && $_SESSION['cart_loaded_from_db'] === true;
+if (isset($_SESSION['user_id']) && !$cartLoaded) {
+  require_once __DIR__ . '/../config/db.php';
+  ensureSessionCartInitialized($conn, (int) $_SESSION['user_id']);
+  $conn->close();
+}
 ?>
 
 <!DOCTYPE html>
