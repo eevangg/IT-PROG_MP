@@ -138,10 +138,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
         }
 
+        // Delete cart items from the database after checkout
+        $cartIdStmt = $conn->prepare("SELECT cart_id FROM carts WHERE user_id = ?");
+        $cartIdStmt->bind_param("i", $user_id);
+        $cartIdStmt->execute();
+        $cartIdResult = $cartIdStmt->get_result();
+        $cartRow = $cartIdResult->fetch_assoc();
+        $cartIdStmt->close();
+
+        if ($cartRow) {
+            $cart_id = $cartRow['cart_id'];
+
+            // Delete all cart items
+            $deleteCartItems = $conn->prepare("DELETE FROM cart_items WHERE cart_id = ?");
+            if (!$deleteCartItems) {
+                throw new Exception("Prepare failed: " . $conn->error);
+            }
+            $deleteCartItems->bind_param("i", $cart_id);
+            if (!$deleteCartItems->execute()) {
+                throw new Exception("Execute failed: " . $deleteCartItems->error);
+            }
+            $deleteCartItems->close();
+
+        }
         // Commit transaction
         $conn->commit();
 
         // Clear cart and update session balance
+
         $_SESSION['cart'] = [];
         $_SESSION['balance'] = $new_balance;
 
