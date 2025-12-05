@@ -857,14 +857,16 @@ INSERT INTO `cart` (`user_id`) VALUES (1), (2), (3);
 -- Table `canteen_preorder_db`.`cart_items`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`cart_items` (
-  `cart_item_id` INT NOT NULL AUTO_INCREMENT,
-  `cart_id` INT NOT NULL,
-  `item_id` INT NOT NULL,
-  `quantity` INT NOT NULL DEFAULT 1,
+  `cart_item_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `cart_id` INT(11) NOT NULL,
+  `plan_id` INT(11) NOT NULL,
+  `item_id` INT(11) NOT NULL,
+  `quantity` INT(11) NOT NULL DEFAULT 1,
   `subtotal` DECIMAL(10,2) NOT NULL,
   PRIMARY KEY (`cart_item_id`),
-  INDEX `cart_id` (`cart_id` ASC),
-  INDEX `item_id` (`item_id` ASC),
+  INDEX `cart_id` (`cart_id` ASC) VISIBLE,
+  INDEX `item_id` (`item_id` ASC) VISIBLE,
+  INDEX `fk_cart_items_meal_plans1_idx` (`plan_id` ASC),
   CONSTRAINT `cart_items_ibfk_1`
     FOREIGN KEY (`cart_id`)
     REFERENCES `canteen_preorder_db`.`cart` (`cart_id`)
@@ -874,8 +876,12 @@ CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`cart_items` (
     FOREIGN KEY (`item_id`)
     REFERENCES `canteen_preorder_db`.`menu_items` (`item_id`)
     ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_cart_items_meal_plans1`
+    FOREIGN KEY (`plan_id`)
+    REFERENCES `canteen_preorder_db`.`meal_plans` (`plan_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci;
@@ -883,22 +889,22 @@ COLLATE = utf8mb4_general_ci;
 -- -----------------------------------------------------
 -- Sample Data for `cart_items`
 -- -----------------------------------------------------
-INSERT INTO `cart_items` (`cart_id`, `item_id`, `quantity`, `subtotal`) VALUES
-(1, 1, 2, 100.00),
-(1, 3, 1, 40.00),
-(2, 2, 1, 85.00),
+INSERT INTO `cart_items` (`cart_id`, `plan_id`, `item_id`, `quantity`, `subtotal`) VALUES
+(1, 8, 4, 2, 100.00),
+(1, 29, 6, 1, 40.00),
+(2, 40,  5, 1, 85.00),
 
-(1, 2, 1, 70.00),
-(1, 5, 2, 70.00),
-(1, 9, 1, 25.00),
+(1, 40, 5, 1, 70.00),
+(1, 52, 8, 2, 70.00),
+(1, 91, 12, 1, 25.00),
 
-(2, 12, 1, 40.00),
-(2, 38, 1, 35.00),
-(2, 46, 2, 50.00),
+(2, 91, 12, 1, 25.00),
+(2, 85, 38, 1, 35.00),
+(2, 111, 46, 2, 50.00),
 
-(3, 15, 1, 95.00),
-(3, 1, 1, 55.00),
-(3, 29, 1, 120.00);
+(3, 42, 15, 1, 95.00),
+(3, 8, 4, 1, 55.00),
+(3, 60, 29, 1, 120.00);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
