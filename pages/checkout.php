@@ -1,40 +1,50 @@
 <?php 
-$pageTitle = "Checkout - ArcherInnov Canteen Pre-order System";
-include('../includes/initial.php');
+    $pageTitle = "Checkout - ArcherInnov Canteen Pre-order System";
+    include('../includes/initial.php');
 
-// Redirect if not logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+    // Redirect if not logged in
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: login.php");
+        exit();
+    }
 
-include('../config/db.php');
+    include('../config/db.php');
 
-// Get user's balance
-$user_id = $_SESSION['user_id'];
-$sql = "SELECT balance FROM users WHERE user_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$accountBalance = $user['balance'] ?? 0;
-$stmt->close();
+    // Get user's balance
+    $user_id = $_SESSION['user_id'];
+    $sql = "SELECT balance FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+    $accountBalance = $user['balance'] ?? 0;
+    $stmt->close();
 
-// Get cart items
-$cartItems = $_SESSION['cart'] ?? [];
-$cartTotal = 0;
+    // Get cart items
+    $cartItems = [];
 
-if (empty($cartItems)) {
-    header("Location: orders.php");
-    exit();
-}
+    if (!empty($_SESSION['cart'])) {
+        foreach ($_SESSION['cart'] as $itemId => $plans) {
+            foreach ($plans as $planId => $itemData) {
+                // Add plan_id inside itemData for convenience
+                $itemData['plan_id'] = $planId;
+                $cartItems[] = $itemData;
+            }
+        }
+    }
+    $cartTotal = 0;
 
-foreach ($cartItems as $item) {
-    $cartTotal += $item['price'] * $item['quantity'];
-}
+    if (empty($cartItems)) {
+        header("Location: orders.php");
+        exit();
+    }
 
-$conn->close();
+    foreach ($cartItems as $item) {
+        $cartTotal += $item['price'] * $item['quantity'];
+    }
+
+    $conn->close();
 ?>
 
 <main class="container my-5">

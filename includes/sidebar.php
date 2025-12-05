@@ -45,7 +45,7 @@ if (isset($_SESSION['username']) && (!isset($_SESSION['is_admin']) && !isset($_S
           </li>
           <li class="nav-item mb-2">
             <a href="manage_topup_requests.php" class="nav-link text-white <?php if ($pageTitle === 'Manage Top-Up Requests - ArcherInnov Canteen Pre-order System') echo 'active' ?>>">
-              <i class="bi bi-receipt-cutoff me-2"></i> Manage Top-Up Requests
+              <i class="bi bi-receipt-cutoff me-2"></i> Top-Up Requests
             </a>
           </li>
           <li class="nav-item mb-2">

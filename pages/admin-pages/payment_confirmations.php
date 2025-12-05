@@ -1,12 +1,7 @@
 <?php 
-$pageTitle = "Payment Confirmations - Admin Dashboard";
+$pageTitle = "Payment Confirmations - ArcherInnov Canteen Pre-order System";
 include('../includes/header.php');
 
-// Check if user is admin
-if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
-    header("Location: access_denied.php");
-    exit();
-}
 
 include('../config/db.php');
 

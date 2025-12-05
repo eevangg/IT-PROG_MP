@@ -30,7 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Get cart items
-    $cartItems = $_SESSION['cart'] ?? [];
+    $cartItems = [];
+
+    if (!empty($_SESSION['cart'])) {
+        foreach ($_SESSION['cart'] as $itemId => $plans) {
+            foreach ($plans as $planId => $itemData) {
+                // Add plan_id inside itemData for convenience
+                $itemData['plan_id'] = $planId;
+                $cartItems[] = $itemData;
+            }
+        }
+    }
     if (empty($cartItems)) {
         $_SESSION['order_feedback'] = ['type' => 'danger', 'message' => 'Your cart is empty.'];
         header("Location: ../pages/orders.php");

@@ -1,71 +1,71 @@
 <?php 
-$pageTitle = "Order Confirmation - ArcherInnov Canteen Pre-order System";
-include('../includes/initial.php');
+    $pageTitle = "Order Confirmation - ArcherInnov Canteen Pre-order System";
+    include('../includes/initial.php');
 
-// Redirect if not logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+    // Redirect if not logged in
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: login.php");
+        exit();
+    }
 
-include('../config/db.php');
+    include('../config/db.php');
 
-// Get order ID from URL
-$order_id = $_GET['order_id'] ?? null;
-if (!$order_id || !is_numeric($order_id)) {
-    header("Location: orders.php");
-    exit();
-}
+    // Get order ID from URL
+    $order_id = $_GET['order_id'] ?? null;
+    if (!$order_id || !is_numeric($order_id)) {
+        header("Location: orders.php");
+        exit();
+    }
 
-// Fetch order details
-$user_id = $_SESSION['user_id'];
-$sql = "SELECT o.*, u.full_name, u.email FROM orders o 
-        JOIN users u ON o.user_id = u.user_id 
-        WHERE o.order_id = ? AND o.user_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ii", $order_id, $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$order = $result->fetch_assoc();
-$stmt->close();
+    // Fetch order details
+    $user_id = $_SESSION['user_id'];
+    $sql = "SELECT o.*, u.full_name, u.email FROM orders o 
+            JOIN users u ON o.user_id = u.user_id 
+            WHERE o.order_id = ? AND o.user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $order_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $order = $result->fetch_assoc();
+    $stmt->close();
 
-if (!$order) {
-    header("Location: orders.php");
-    exit();
-}
+    if (!$order) {
+        header("Location: orders.php");
+        exit();
+    }
 
-// Fetch order items
-$sql = "SELECT od.*, m.item_name FROM order_details od 
-        JOIN menu_items m ON od.item_id = m.item_id 
-        WHERE od.order_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $order_id);
-$stmt->execute();
-$items_result = $stmt->get_result();
-$order_items = $items_result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+    // Fetch order items
+    $sql = "SELECT od.*, m.item_name FROM order_details od 
+            JOIN menu_items m ON od.item_id = m.item_id 
+            WHERE od.order_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $order_id);
+    $stmt->execute();
+    $items_result = $stmt->get_result();
+    $order_items = $items_result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
 
-$conn->close();
+    $conn->close();
 
-// Format payment method
-$paymentLabels = [
-    'wallet' => 'School Wallet',
-    'qr' => 'QR Code',
-    'cash' => 'Cash',
-    'card' => 'Debit/Credit Card'
-];
-$paymentMethod = $paymentLabels[$order['payment_method']] ?? $order['payment_method'];
+    // Format payment method
+    $paymentLabels = [
+        'wallet' => 'School Wallet',
+        'qr' => 'QR Code',
+        'cash' => 'Cash',
+        'card' => 'Debit/Credit Card'
+    ];
+    $paymentMethod = $paymentLabels[$order['payment_method']] ?? $order['payment_method'];
 
-// Status badge colors
-$statusColors = [
-    'pending' => 'warning',
-    'confirmed' => 'info',
-    'preparing' => 'info',
-    'ready' => 'success',
-    'completed' => 'success',
-    'cancelled' => 'danger'
-];
-$statusColor = $statusColors[$order['status']] ?? 'secondary';
+    // Status badge colors
+    $statusColors = [
+        'pending' => 'warning',
+        'confirmed' => 'info',
+        'preparing' => 'info',
+        'ready' => 'success',
+        'completed' => 'success',
+        'cancelled' => 'danger'
+    ];
+    $statusColor = $statusColors[$order['status']] ?? 'secondary';
 ?>
 
 <main class="container my-5 fullHeight">
@@ -211,8 +211,8 @@ $statusColor = $statusColors[$order['status']] ?? 'secondary';
             <!-- Actions -->
             <div class="d-flex gap-2 flex-wrap">
                 <a href="menu.php" class="btn btn-outline-success flex-grow-1">Continue Shopping</a>
-                <a href="history.php" class="btn btn-outline-primary flex-grow-1">View My Orders</a>
-                <a href="profile.php" class="btn btn-outline-secondary flex-grow-1">Account</a>
+                <a href="history.php" class="btn btn-outline-success flex-grow-1">View My Orders</a>
+                <a href="profile.php" class="btn btn-outline-success flex-grow-1">Account</a>
             </div>
         </div>
     </div>

@@ -82,7 +82,7 @@ include('../includes/header.php');
     ?>
 
     <div class="d-flex justify-content-between align-items-center mt-4">
-        <h3>Menu for <span class="text-primary"><?= $selectedDay ?></span></h3>
+        <h3>Menu for <span class="text-warning"><?= $selectedDay ?></span></h3>
         
         <form method="GET" action="">
             <label class="me-2">Select Day:</label>

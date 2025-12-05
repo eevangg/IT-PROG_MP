@@ -50,7 +50,7 @@ if (isset($_SESSION['user_id']) && !$cartLoaded) {
     <nav class="navbar navbar-expand-lg bg-success sticky-top">
       <div class="container-fluid">
         <div class="logo">
-          <p class="navbar-brand" href="/">ArcherInnov Canteen</p>
+          <a class="text-decoration-none" href="menu.php"><p class="navbar-brand">ArcherInnov Canteen</p></a>
         </div>
 
         <!-- Nav Bar toggler -->
