@@ -1,4 +1,5 @@
 <?php
+// Process checkout: validate cart/inputs, create order + details inside a transaction, adjust stock, and handle wallet deductions.
 session_start();
 include "../config/db.php";
 
@@ -11,7 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $user_id = $_SESSION['user_id'];
-    $payment_method = $_POST['payment_method'] ?? 'wallet';
+    // Whitelist payment methods to avoid falling back to the enum default unexpectedly.
+    $payment_method = trim($_POST['payment_method'] ?? 'wallet');
+    $allowed_payment_methods = ['wallet', 'cash'];
+    if (!in_array($payment_method, $allowed_payment_methods, true)) {
+        $payment_method = 'wallet';
+    }
     $pickup_time = $_POST['pickup_time'] ?? null;
     $agree = $_POST['agree'] ?? false;
 

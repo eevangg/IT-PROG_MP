@@ -1,4 +1,5 @@
 <?php
+    // Admin creation of meal plan entries (day/week availability per item).
     session_start();
 
     include('../../config/db.php');

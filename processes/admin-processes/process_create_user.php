@@ -1,4 +1,5 @@
 <?php
+    // Admin endpoint to create users with uniqueness and required-field checks.
     session_start();
     include('../../config/db.php');
 

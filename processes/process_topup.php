@@ -1,4 +1,5 @@
 <?php
+// Submit a wallet top-up request and redirect the user back to checkout/profile with feedback messaging.
 session_start();
 include "../config/db.php";
 

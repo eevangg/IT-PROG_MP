@@ -30,24 +30,51 @@
     </div>
 
     <?php
-        // 1. Fetch Summary Data (Only Pending)
-        $pendingData = $conn->query("SELECT COUNT(*) as count, SUM(amount) as total FROM topup_requests WHERE status = 'pending'")->fetch_assoc();
-        $pendingCount = $pendingData['count'] ?? 0;
-        $pendingTotal = $pendingData['total'] ?? 0;
+        // Make sure the top-up table exists to avoid fatal errors when the page is opened before any requests are made.
+        $topupTableSql = "CREATE TABLE IF NOT EXISTS topup_requests (
+            request_id INT NOT NULL AUTO_INCREMENT,
+            user_id INT NOT NULL,
+            amount DECIMAL(10,2) NOT NULL,
+            status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+            request_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            approved_date DATETIME NULL,
+            PRIMARY KEY (request_id),
+            INDEX user_id (user_id ASC),
+            CONSTRAINT topup_requests_ibfk_1
+                FOREIGN KEY (user_id)
+                REFERENCES users (user_id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci";
 
-        // 2. Fetch All Requests (Pending first, then by date)
-        $sql = "SELECT r.*, u.username, u.full_name 
-                FROM topup_requests r 
-                JOIN users u ON r.user_id = u.user_id 
-                ORDER BY FIELD(r.status, 'pending', 'approved', 'rejected'), r.request_date DESC";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $requests = [];
-        while ($row = $result->fetch_assoc()) {
-            $requests[] = $row;
+        $tableError = null;
+        if (!$conn->query($topupTableSql)) {
+            $tableError = "Unable to load top-up requests right now. " . $conn->error;
+            $pendingCount = 0;
+            $pendingTotal = 0.00;
+            $requests = [];
         }
-        $stmt->close();
+
+        if (!$tableError) {
+            // 1. Fetch Summary Data (Only Pending)
+            $pendingData = $conn->query("SELECT COUNT(*) as count, SUM(amount) as total FROM topup_requests WHERE status = 'pending'")->fetch_assoc();
+            $pendingCount = $pendingData['count'] ?? 0;
+            $pendingTotal = $pendingData['total'] ?? 0;
+
+            // 2. Fetch All Requests (Pending first, then by date)
+            $sql = "SELECT r.*, u.username, u.full_name 
+                    FROM topup_requests r 
+                    JOIN users u ON r.user_id = u.user_id 
+                    ORDER BY FIELD(r.status, 'pending', 'approved', 'rejected'), r.request_date DESC";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $requests = [];
+            while ($row = $result->fetch_assoc()) {
+                $requests[] = $row;
+            }
+            $stmt->close();
+        }
     ?>
 
     <div class="row g-3 mb-3 w-100">
@@ -97,6 +124,12 @@
     <br>
 
     <p class="text-muted text-center">Manage user wallet top-up requests. Approving a request will automatically add funds to the user's balance.</p>
+
+    <?php if ($tableError): ?>
+        <div class="alert alert-danger text-center w-100" role="alert">
+            <?= htmlspecialchars($tableError) ?>
+        </div>
+    <?php endif; ?>
 
     <?php if(count($requests) > 0): ?>
     <div class="card shadow-sm w-100">

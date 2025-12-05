@@ -152,7 +152,16 @@ include('../../includes/sidebar.php');
                             <i class="bi bi-caret-down"></i>
                         </button>
                     </td>
-                    <td><?=$order['payment_method']?></td>
+                    <?php
+                        // Human-friendly payment label; defaults to raw value if it is unexpected.
+                        $paymentLabel = [
+                            'wallet' => 'Wallet',
+                            'cash' => 'Cash',
+                            'qr' => 'QR',
+                            'card' => 'Card'
+                        ][$order['payment_method']] ?? $order['payment_method'];
+                    ?>
+                    <td><?= htmlspecialchars($paymentLabel) ?></td>
                     
                     <td>
                         <!-- Payment Status Display mode -->

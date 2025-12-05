@@ -1,4 +1,5 @@
 <?php
+    // Admin deletion handler for orders, menu items, or meal plans based on the provided action.
     session_start();
     // Include database configuration 
     include('../../config/db.php');

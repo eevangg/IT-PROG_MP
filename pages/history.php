@@ -6,7 +6,11 @@ include('../config/db.php');
 $userId = $_SESSION['user_id'];
 $orders = [];
 
-$orderSql = "SELECT order_id, order_date, total_amount, status FROM orders WHERE user_id = ? ORDER BY order_date DESC";
+$orderSql = "SELECT o.order_id, o.order_date, o.total_amount, o.status, COALESCE(p.payment_status, 'pending') AS payment_status
+             FROM orders o
+             LEFT JOIN payments p ON p.order_id = o.order_id
+             WHERE o.user_id = ?
+             ORDER BY o.order_date DESC";
 $stmt = $conn->prepare($orderSql);
 $stmt->bind_param("i", $userId);
 $stmt->execute();
@@ -34,7 +38,8 @@ $stmt->close();
             <th scope="col">Date</th>
             <th scope="col">Items</th>
             <th scope="col">Total</th>
-            <th scope="col">Status</th>
+            <th scope="col">Payment Status</th>
+            <th scope="col">Order Status</th>
           </tr>
         </thead>
         <tbody>
@@ -62,6 +67,7 @@ $stmt->close();
               <td><?= htmlspecialchars($itemsText) ?></td>
               <td>₱<?= number_format($order['total_amount'], 2) ?></td>
               <td><?= ucfirst(htmlspecialchars($order['status'])) ?></td>
+              <td><?= ucfirst(htmlspecialchars($order['payment_status'])) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

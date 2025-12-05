@@ -1,4 +1,5 @@
 <?php
+    // Handle new user registrations with basic validation and uniqueness checks.
     session_start();
     include ("../config/db.php");
 

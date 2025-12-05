@@ -1,9 +1,10 @@
 <?php 
+session_start();
 $pageTitle = "Payment Confirmations - ArcherInnov Canteen Pre-order System";
-include('../includes/header.php');
+include('../../includes/sidebar.php');
 
 
-include('../config/db.php');
+include('../../config/db.php');
 
 // Get all pending payment confirmations
 $sql = "SELECT o.order_id, o.total_amount, o.payment_method, o.order_date, o.pickup_time, o.status,
@@ -14,19 +15,29 @@ $sql = "SELECT o.order_id, o.total_amount, o.payment_method, o.order_date, o.pic
         WHERE o.payment_method IN ('cash', 'qr') AND o.status = 'pending'
         GROUP BY o.order_id
         ORDER BY o.order_date DESC";
-$result = $conn->query($sql);
-$pending_payments = $result->fetch_all(MYSQLI_ASSOC);
+    $result = $conn->query($sql);
+    $pending_payments = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 
 $conn->close();
 ?>
 
-<main class="container my-5">
-    <h2 class="mb-4">Payment Confirmations</h2>
+<main class="admin-content container my-5 fullHeight d-flex flex-column align-items-center justify-content-start">
+    <div class="d-flex justify-content-between align-items-center w-100 mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <a href="dashboard.php" class="btn btn-outline-success btn-sm shadow-sm">
+                <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+        </div>
+        <h1 class="text-center flex-grow-1 fw-bold text-success">Payment Confirmations</h1>
+        <button class="btn btn-outline-secondary" onclick="window.location.reload()">
+            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+        </button>
+    </div>
 
     <?php if (!empty($pending_payments)): ?>
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
+            <table class="table table-hover align-middle">
+                <thead class="table-success text-center">
                     <tr>
                         <th>Order ID</th>
                         <th>Customer</th>
@@ -40,7 +51,7 @@ $conn->close();
                 </thead>
                 <tbody>
                     <?php foreach ($pending_payments as $payment): ?>
-                        <tr>
+                        <tr class="text-center">
                             <td><strong>#<?= str_pad($payment['order_id'], 5, '0', STR_PAD_LEFT) ?></strong></td>
                             <td><?= htmlspecialchars($payment['full_name']) ?></td>
                             <td><strong class="text-success">&#8369;<?= number_format($payment['total_amount'], 2) ?></strong></td>
@@ -62,7 +73,7 @@ $conn->close();
             </table>
         </div>
     <?php else: ?>
-        <div class="alert alert-info">
+        <div class="alert alert-info text-center w-100">
             <i class="bi bi-info-circle me-2"></i>
             No pending payment confirmations at this time.
         </div>
@@ -77,7 +88,7 @@ $conn->close();
                 <h5 class="modal-title">Confirm Payment</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="../processes/admin-processes/process_confirm_payment.php">
+            <form method="POST" action="../../processes/admin-processes/process_confirm_payment.php">
                 <div class="modal-body">
                     <input type="hidden" id="orderId" name="order_id">
                     
@@ -133,4 +144,4 @@ function setOrderData(orderId, customerName, amount, paymentMethod) {
 }
 </script>
 
-<?php include('../includes/footer.php'); ?>
+<?php include('../../includes/closing.php'); ?>

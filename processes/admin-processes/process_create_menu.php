@@ -1,4 +1,5 @@
 <?php
+    // Admin creation of menu items, handling image uploads and basic validation.
     session_start();
 
     include('../../config/db.php');

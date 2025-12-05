@@ -1,4 +1,5 @@
 <?php
+    // Handle user password changes with current password verification.
     session_start();
     include("../config/db.php");
 
