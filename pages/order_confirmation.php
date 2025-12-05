@@ -131,6 +131,48 @@ $statusColor = $statusColors[$order['status']] ?? 'secondary';
                 </div>
             </div>
 
+            <!-- Payment Status Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h6 class="mb-3 border-bottom pb-2">Payment Status</h6>
+                    
+                    <?php if ($order['payment_method'] === 'wallet'): ?>
+                        <div class="alert alert-success mb-0">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle me-2"></i>
+                                <div>
+                                    <strong>Payment Confirmed</strong>
+                                    <br>
+                                    <small>Your wallet has been charged &#8369;<?= number_format($order['total_amount'], 2) ?></small>
+                                </div>
+                            </div>
+                        </div>
+                    <?php elseif ($order['payment_method'] === 'cash'): ?>
+                        <div class="alert alert-warning mb-0">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-hourglass me-2"></i>
+                                <div>
+                                    <strong>Awaiting Payment Confirmation</strong>
+                                    <br>
+                                    <small>Admin will confirm cash payment at pickup. Amount: &#8369;<?= number_format($order['total_amount'], 2) ?></small>
+                                </div>
+                            </div>
+                        </div>
+                    <?php elseif ($order['payment_method'] === 'qr'): ?>
+                        <div class="alert alert-warning mb-0">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-hourglass me-2"></i>
+                                <div>
+                                    <strong>Awaiting Payment Confirmation</strong>
+                                    <br>
+                                    <small>Admin will verify QR code payment. Amount: &#8369;<?= number_format($order['total_amount'], 2) ?></small>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
             <!-- Next Steps -->
             <div class="card mb-4">
                 <div class="card-header bg-light">

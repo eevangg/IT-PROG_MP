@@ -79,6 +79,7 @@ include('../../includes/sidebar.php');
       <h3 class="text-center fw-bold text-success">Quick Actions</h3>
       <br>
       <a href="manage_orders.php" class="btn btn-success mx-2">Manage Orders</a>
+      <a href="payment_confirmations.php" class="btn btn-warning mx-2"><i class="bi bi-credit-card"></i> Payment Confirmations</a>
       <a href="manage_menu.php" class="btn btn-success mx-2">Manage Menu</a>
       <a href="manage_meal_plans.php" class="btn btn-success mx-2">Meal Plans</a>
       <a href="manage_users.php" class="btn btn-success mx-2">User Management</a>
