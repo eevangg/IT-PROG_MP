@@ -15,7 +15,11 @@
         <i class="bi bi-house-door me-1"></i> Home
       </a>
     </div>
-    <h1 class="text-center flex-grow-1 fw-bold text-success">Management Dashboard</h1>
+    <?php if (isset($_SESSION['is_admin'])): ?>
+      <h1 class="text-center flex-grow-1 fw-bold text-success">Admin Dashboard</h1>
+    <?php elseif (isset($_SESSION['is_staff'])): ?>
+      <h1 class="text-center flex-grow-1 fw-bold text-success">Staff Dashboard</h1>
+    <?php endif; ?>
     <a href="../../processes/logout.php" class="btn btn-outline-success btn-sm shadow-sm logoutButton">Logout</a>
   </div>
 

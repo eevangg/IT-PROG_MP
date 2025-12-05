@@ -13,7 +13,7 @@ include ('../includes/initial.php');
             <br>
             <div class="mb-3">
                 <label for="fullname" class="form-label">Full Name:</label>
-                <input type="text" class="form-control" id="fullname" name="fullname" required minlength="2">
+                <input type="text" class="form-control" id="fullname" name="fullname" required minlength="2" pattern="^[A-Za-zÀ-ÿ' -]{2,} [A-Za-zÀ-ÿ' -]{2,}$">
                 <div class="invalid-feedback">Please input a valid name</div>
             </div>
 
