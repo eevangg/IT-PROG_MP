@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `canteen_preorder_db`.`menu_items` (
   `price` DECIMAL(10,2) NOT NULL,
   `stock` INT NOT NULL,
   `description` TEXT NULL DEFAULT NULL,
-  `image` VARCHAR(100) NULL DEFAULT NULL,
+  `image` VARCHAR(500) NULL DEFAULT NULL,
   `status` ENUM('active', 'inactive') NULL DEFAULT 'active',
   PRIMARY KEY (`item_id`))
 ENGINE = InnoDB
@@ -92,7 +92,62 @@ INSERT INTO `menu_items` (`item_name`, `category`, `price`, `stock`, `descriptio
 ('Hotsilog', 'Breakfast', 55.00, 25, 'Hotdog with garlic rice and egg', 'active'),
 ('Tocilog', 'Breakfast', 60.00, 24, 'Tocino with garlic rice and egg', 'active');
 
-
+UPDATE menu_items
+SET image = CASE item_id
+    WHEN 4 THEN 'hhttps://www.marthastewart.com/thmb/Vgb9cQSlegZz5fcoSbkkqyHPmHY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/338185-basic-pancakes-09-00b18f8418fd4e52bb2050173d083d04.jpg'
+    WHEN 5 THEN 'https://www.seriouseats.com/thmb/uc8nb040OwgXekR9obuhEqm8WoI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__serious_eats__seriouseats.com__2019__10__20191023-chicken-adobo-vicky-wasik-19-12ce105a2e1a44dfb1e2673775118064.jpg'
+    WHEN 6 THEN 'https://cdn6.projectmealplan.com/wp-content/uploads/2021/07/lazy-no-chop-tuna-salad-hero-side-scaled.jpg'
+    WHEN 7 THEN 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6QWGUhvMK40QEIf4SuAEtLJHYZwXovJokZA&s'
+    WHEN 8 THEN 'https://www.kawalingpinoy.com/wp-content/uploads/2016/01/filipino-beef-tapa-7.jpg'
+    WHEN 9 THEN 'https://panlasangpinoy.com/wp-content/uploads/2022/09/pork-sinigang-panlasang-pinoy.jpg'
+    WHEN 10 THEN 'https://www.nestlegoodnes.com/ph/sites/default/files/srh_recipes/fb57f76d3cd9b83f1509f030c7024b51.jpg'
+    WHEN 11 THEN 'https://www.nestlegoodnes.com/ph/sites/default/files/styles/1_1_768px_width/public/srh_recipes/25cf95a942d7253ccb0e43f8b039143f.jpg.webp'
+    WHEN 12 THEN 'https://themayakitchen.com/wp-content/uploads/2019/10/TURON-1024x683.jpg'
+    WHEN 13 THEN 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Bibingka-6.jpg'
+    WHEN 14 THEN 'https://ricelifefoodie.com/wp-content/uploads/2025/06/filipino-halo-halo-mix-mix-dessert-in-a-big-glass-500x500.jpg?crop=1'
+    WHEN 15 THEN 'https://i1.wp.com/www.foodwithmae.com/wp-content/uploads/2021/07/sagotgulamandrinkFoodwithMae-1-e1628688120251.jpg?fit=667%2C737&ssl=1'
+    WHEN 16 THEN 'https://panlasangpinoy.com/wp-content/uploads/2017/05/Chicken-Arroz-Caldo-2-500x500.jpg'
+    WHEN 17 THEN 'https://cdn.sanity.io/images/f3knbc2s/production/b5318405e36335e00e82b10ffcf7b439fff513af-2500x1600.jpg?auto=format'
+    WHEN 18 THEN 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/EGGPLANT_TORTA.jpg/1200px-EGGPLANT_TORTA.jpg'
+    WHEN 19 THEN 'https://www.kawalingpinoy.com/wp-content/uploads/2019/05/laing-9-500x500.jpg'
+    WHEN 20 THEN 'https://yummyfood.ph/wp-content/uploads/2021/08/Chicken-Adobo-Recipe-1.jpg'
+    WHEN 21 THEN 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Authentic_Kapampangan_Sisig.jpg'
+    WHEN 22 THEN 'https://pilipinasrecipes.com/wp-content/uploads/2017/08/Kare-Kare-Recipe.jpg'
+    WHEN 23 THEN 'https://www.nestlegoodnes.com/ph/sites/default/files/styles/1_1_768px_width/public/srh_recipes/cc4a6bd562aaede4f83cbf6415965691.jpg.webp'
+    WHEN 24 THEN 'https://www.simplyrecipes.com/thmb/TL9sgDRkhyiU9ed6nPfoFEoOKrA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Simply-Recipes-Macaroni-Chicken-Sopas-LEAD-03-8cd1732ce3dd4417b4310ddae8dc2ca0.jpg'
+    WHEN 25 THEN 'https://assets.unileversolutions.com/recipes-v2/110752.jpg'
+    WHEN 26 THEN 'https://www.foxyfolksy.com/wp-content/uploads/2021/07/goto-recipe.jpg'
+    WHEN 27 THEN 'https://cdn.sanity.io/images/f3knbc2s/production/20d7a65b5be8b1b90dac5995c0265fea7a3798be-2500x1500.jpg?auto=format'
+    WHEN 28 THEN 'https://yummykitchentv.com/wp-content/uploads/2021/05/puto-cheese-without-eggs.jpg'
+    WHEN 29 THEN 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRupEQNw-TluStsLqcJ3skM0AVle8nH-_HAWQ&s'
+    WHEN 30 THEN 'https://yummykitchentv.com/wp-content/uploads/2023/08/champorado-recipe.jpg'
+    WHEN 31 THEN 'https://www.foxyfolksy.com/wp-content/uploads/2017/05/taho-recipe-640-500x500.jpg'
+    WHEN 32 THEN 'https://i0.wp.com/www.russianfilipinokitchen.com/wp-content/uploads/2015/04/crispy-fried-calamari-01.jpg'
+    WHEN 33 THEN 'https://assets.epicurious.com/photos/5b9147b3f2a7a12d4192d0a5/1:1/w_2560%2Cc_limit/inihaw-bbq-chicken-skewers-090418.jpg'
+    WHEN 34 THEN 'https://pinoybites.com/wp-content/uploads/2020/06/Snapseed-52-scaled.jpg'
+    WHEN 35 THEN 'https://i2.wp.com/www.foodwithmae.com/wp-content/uploads/2019/01/BeefBulaloMaeRecipe.jpg?fit=2548%2C2506&ssl=1'
+    WHEN 36 THEN 'https://www.kawalingpinoy.com/wp-content/uploads/2018/07/ginisang-munggo-chicharon-5.jpg'
+    WHEN 37 THEN 'https://www.seriouseats.com/thmb/BHTueEcNShZmWVlwc4_VVmhfLYs=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/20210712-pinakbet-vicky-wasik-seriouseats-12-37ac6b9ea57145728de86f927dc5fef6.jpg'
+    WHEN 38 THEN 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv5kCgLz2w16AgoLGr5IYbMOBkYAMkLO__Dg&s'
+    WHEN 39 THEN 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR08DfYetJEU-nHRoqNESRDOT2DLb1tBWABZA&s'
+    WHEN 40 THEN 'https://assets.unileversolutions.com/recipes-v2/214409.png'
+    WHEN 41 THEN 'https://panlasangpinoy.com/wp-content/uploads/2021/08/Pinoy-Style-Chicken-Curry-jpg.webp'
+    WHEN 42 THEN 'https://www.marionskitchen.com/wp-content/uploads/2022/12/Filipino-Spaghetti-01-1200x1500.jpg'
+    WHEN 43 THEN 'https://kitchenconfidante.com/wp-content/uploads/2021/01/Pancit-Palabok-kitchenconfidante.com-2868-FEATURED-IMAGE.jpg'
+    WHEN 44 THEN 'https://thefatbutcherph.com/cdn/shop/articles/Untitled_2cf98e1c-d858-4a03-afab-123344145030.jpg?v=1755828196'
+    WHEN 45 THEN 'https://www.kawalingpinoy.com/wp-content/uploads/2020/07/siopao-asado-4.jpg'
+    WHEN 46 THEN 'https://cdn.loveandlemons.com/wp-content/uploads/2025/05/iced-coffee.jpg'
+    WHEN 47 THEN 'https://shopmetro.ph/lapulapu-supermarket/wp-content/uploads/2025/06/SM2071671-1-6.webp'
+    WHEN 48 THEN 'https://cdn.shortpixel.ai/spai/q_lossy+ret_img+to_webp/salangikopu.com/wp-content/uploads/2020/09/Coca-Cola-Coke-Mismo-295ml-Main.png'
+    WHEN 49 THEN 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScnMYpAXdL19uHDohOhQRpisO1VG_sGAxvSw&s'
+    WHEN 50 THEN 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Mais_con_yelo.jpg/250px-Mais_con_yelo.jpg'
+    WHEN 51 THEN 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGRQhsPWEZpnzeSUUUvd2Eal5mFTnIHYt2PQ&s'
+    WHEN 52 THEN 'https://panlasangpinoy.com/wp-content/uploads/2010/04/ginataang-mais-corn-in-coconut-milk-recipe.jpg'
+    WHEN 53 THEN 'https://kusinasecrets.com/wp-content/uploads/2025/06/u3317447599_Longsilog_on_white_ceramic_plate_golden_crispy_lo_8944ae52-3a4c-4587-916e-1d0d11aa2d64_0-500x500.jpg'
+    WHEN 54 THEN 'https://panlasangpinoy.com/wp-content/uploads/2017/07/Hotdog-Sinangag-at-Itlog.jpg'
+    WHEN 55 THEN 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmPWLOaBk-ThI7LjueKnQ5ioSfiE1ntuWuPw&s'
+END
+WHERE item_id IN (4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55);
 -- -----------------------------------------------------
 -- Table `canteen_preorder_db`.`inventory_logs`
 -- -----------------------------------------------------
