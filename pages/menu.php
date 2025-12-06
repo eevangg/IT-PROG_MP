@@ -105,8 +105,14 @@ include('../includes/header.php');
                      data-name="<?= strtolower($item['item_name']) ?>" 
                      data-category="<?= $item['category'] ?>" 
                      data-price="<?= $item['price'] ?>">
-                     
-                  <img src="../assets/images/menu_items/<?= $item['image']?>" class="card-img-top" alt="">
+                  <?php if (!empty($item['image'])): ?>
+                    <img src="<?= $item['image'] ?>" class="card-img-top" alt="<?= htmlspecialchars($item['item_name']) ?>">
+                  <?php else: ?>
+                      <div class="text-center p-5 bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                          <i class="bi bi-card-image fs-1 text-muted"></i>
+                          <p class="text-muted small ms-2 mb-0">No Image Available</p>
+                      </div>
+                  <?php endif; ?>
                   <div class="card-body d-flex flex-column">
                     <h5 class="card-title"><?= $item['item_name'] ?></h5>
                     <p class="card-subtitle mb-2 text-body-secondary"><?= $item['category']?></p>
