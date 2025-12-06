@@ -481,9 +481,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const weekStart = document.getElementById("week_start");
+    if(weekStart){
+        weekStart.addEventListener("change", function() {
+            const selectedDate = new Date(this.value);
+            const day = selectedDate.getDay(); // Monday = 1
+        
+            if (day !== 1) {
+                this.value = ""; // Clear invalid date
+                document.querySelector('#weekStart .invalid-feedback').textContent = "Week must start on a Monday.";
+                this.classList.add("is-invalid");
+            } else {
+                this.classList.remove("is-invalid");
+            }
+        });
+    }
 
     // Handle create meal plan form submission
-    planForm = document.getElementById("createMealPlanForm");
+    const planForm = document.getElementById("createMealPlanForm");
     if (planForm) {
         planForm.addEventListener("submit", async function(e) {
             e.preventDefault();

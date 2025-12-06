@@ -11,6 +11,13 @@
         $weekStart = $conn->real_escape_string(trim($_POST['week_start']));
         $available_qty = intval($_POST['available_qty']);
 
+        $dayOfWeek = date('N', strtotime($week_start)); // Monday = 1
+
+        if ($dayOfWeek != 1) {
+            echo json_encode(["status" => "error", "message" => "Week must start on a Monday"]);
+            exit();
+        }
+
         // Insert into database
         $sql = "INSERT INTO meal_plans (item_id, day_of_week, week_start, available_qty) 
                 VALUES ($item_id, '$day_of_week', '$weekStart', $available_qty)";

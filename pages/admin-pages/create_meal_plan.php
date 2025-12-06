@@ -59,7 +59,7 @@
                     </select>
                     <div class="invalid-feedback">Please select a day of the week</div>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" id="'weekStart">
                     <label for="week_start" class="form-label">Week Start</label>
                     <input type="date" class="form-control" id="week_start" name="week_start" required>
                     <div class="invalid-feedback">Please select the start date of the week.</div>
