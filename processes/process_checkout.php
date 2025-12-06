@@ -121,13 +121,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $planQuery = "UPDATE meal_plans SET available_qty = available_qty - ? WHERE plan_id = ?";
             $stmt1 = $conn->prepare($sql);
             $stmt2 = $conn->prepare($planQuery);
-            if (!$stmt1 && !$stmt2) {
+            if (!$stmt1 || !$stmt2) {
+                if ($stmt1) {
+                    $stmt1->close();
+                }
+                if ($stmt2) {
+                    $stmt2->close();
+                }
                 throw new Exception("Prepare failed: " . $conn->error);
             }
             $stmt1->bind_param("ii", $quantity, $item_id);
             $stmt2->bind_param("ii", $quantity, $plan_id);
-            if (!$stmt1->execute() || !$stmt2->execute()) {
-                throw new Exception("Execute failed: " . $stmt->error);
+            if (!$stmt1->execute()) {
+                $error = $stmt1->error;
+                $stmt1->close();
+                $stmt2->close();
+                throw new Exception("Execute failed: " . $error);
+            }
+            if (!$stmt2->execute()) {
+                $error = $stmt2->error;
+                $stmt1->close();
+                $stmt2->close();
+                throw new Exception("Execute failed: " . $error);
             }
             $stmt1->close();
             $stmt2->close();
@@ -149,10 +164,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
         }
 
+        // Record payment status (wallet orders are paid immediately; others stay pending until confirmed)
+        $paymentStatus = $payment_method === 'wallet' ? 'paid' : 'pending';
+        $paymentStmt = $conn->prepare("INSERT INTO payments (order_id, payment_method, amount_paid, payment_status) VALUES (?, ?, ?, ?)");
+        if (!$paymentStmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+        $paymentStmt->bind_param("isds", $order_id, $payment_method, $total_amount, $paymentStatus);
+        if (!$paymentStmt->execute()) {
+            $error = $paymentStmt->error;
+            $paymentStmt->close();
+            throw new Exception("Execute failed: " . $error);
+        }
+        $paymentStmt->close();
+
         // Delete cart items from the database after checkout
-        $cartIdStmt = $conn->prepare("SELECT cart_id FROM carts WHERE user_id = ?");
+        $cartIdStmt = $conn->prepare("SELECT cart_id FROM cart WHERE user_id = ?");
+        if (!$cartIdStmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
         $cartIdStmt->bind_param("i", $user_id);
-        $cartIdStmt->execute();
+        if (!$cartIdStmt->execute()) {
+            $error = $cartIdStmt->error;
+            $cartIdStmt->close();
+            throw new Exception("Execute failed: " . $error);
+        }
         $cartIdResult = $cartIdStmt->get_result();
         $cartRow = $cartIdResult->fetch_assoc();
         $cartIdStmt->close();
@@ -167,7 +203,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $deleteCartItems->bind_param("i", $cart_id);
             if (!$deleteCartItems->execute()) {
-                throw new Exception("Execute failed: " . $deleteCartItems->error);
+                $error = $deleteCartItems->error;
+                $deleteCartItems->close();
+                throw new Exception("Execute failed: " . $error);
             }
             $deleteCartItems->close();
 
