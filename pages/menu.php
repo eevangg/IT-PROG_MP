@@ -53,7 +53,7 @@ include('../includes/header.php');
 
       $menuQuery = "SELECT * FROM meal_plans mp 
                     JOIN menu_items m ON m.item_id = mp.item_id
-                    WHERE m.stock > 0 AND m.status = 'active' AND mp.week_start = ?
+                    WHERE m.stock > 0 AND m.status = 'active' AND mp.status = 'available' AND mp.week_start = ?
                     ORDER BY FIELD(mp.day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'), m.item_name";
       
       $stmt = $conn->prepare($menuQuery);

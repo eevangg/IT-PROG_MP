@@ -110,14 +110,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $quantity = $item['quantity'];
             $price = $item['price'];
             $subtotal = $quantity * $price;
-            $stmt->bind_param("iiid", $order_id, $item_id, $quantity, $subtotal);
+            $stmt->bind_param("iiii", $order_id, $item_id, $quantity, $subtotal);
             if (!$stmt->execute()) {
                 throw new Exception("Execute failed: " . $stmt->error);
             }
             $stmt->close();
 
             // Update inventory
-            $sql = "UPDATE menu_items SET stock = stock - ? WHERE item_id = ? AND stock >= 0";
+            $sql = "UPDATE menu_items SET stock = stock - ? WHERE item_id = ?";
             $planQuery = "UPDATE meal_plans SET available_qty = available_qty - ? WHERE plan_id = ?";
             $stmt1 = $conn->prepare($sql);
             $stmt2 = $conn->prepare($planQuery);
