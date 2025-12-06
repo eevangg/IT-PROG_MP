@@ -38,8 +38,8 @@ $stmt->close();
             <th scope="col">Date</th>
             <th scope="col">Items</th>
             <th scope="col">Total</th>
-            <th scope="col">Payment Status</th>
             <th scope="col">Order Status</th>
+            <th scope="col">Payment Status</th>
           </tr>
         </thead>
         <tbody>
