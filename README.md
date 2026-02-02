@@ -1,3 +1,7 @@
+# IT-PROG Machine Project  
+
+---
+
 ![Course](https://img.shields.io/badge/Course-IT--PROG-lightblue)
 ![Institution](https://img.shields.io/badge/Institution-De%20La%20Salle%20University-green)
 ![Project Type](https://img.shields.io/badge/Project-Type%3A%20Machine%20Project-lightgrey)
@@ -15,12 +19,7 @@
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Academic Project](https://img.shields.io/badge/Project-Type%3A%20Academic-lightgrey)
 
----
-
-# IT-PROG Machine Project  
 ## 🍽️Ordering, Inventory, and Pre-Order Management System
-
----
 
 ## 📌 Project Overview
 
