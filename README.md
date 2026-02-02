@@ -1,4 +1,4 @@
-![Course](https://img.shields.io/badge/Course-IT--PROG-blue)
+![Course](https://img.shields.io/badge/Course-IT--PROG-lightblue)
 ![Institution](https://img.shields.io/badge/Institution-De%20La%20Salle%20University-green)
 ![Project Type](https://img.shields.io/badge/Project-Type%3A%20Machine%20Project-lightgrey)
 ![Technologies](https://img.shields.io/badge/Technologies-PHP%2C%20MySQL%2C%20HTML%2FCSS-blueviolet)
@@ -12,7 +12,7 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow?logo=javascript&logoColor=black)
 ![jQuery](https://img.shields.io/badge/jQuery-v3.6-blue?logo=jquery&logoColor=white)
 
-![License](https://img.shields.io/badge/License-Academic-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Academic Project](https://img.shields.io/badge/Project-Type%3A%20Academic-lightgrey)
 
 ---
@@ -171,8 +171,7 @@ This project fulfills the Machine Project requirement for the IT-PROG (Integrati
 ---
 
 ### 📄 License
-This project is intended for academic and educational purposes only.
-Reuse or redistribution should comply with institutional and course policies.
+This project is licensed under the MIT License.
 
 ---
 
