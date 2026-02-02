@@ -178,4 +178,11 @@ This project is licensed under the MIT License.
 ### ⭐ Acknowledgements
 Special thanks to the IT-PROG instructors and the College of Computer Studies for their guidance and support.
 
+---
+
+## 📄 AI Assistance Disclosure
+
+This README file was generated with the assistance of ChatGPT and was reviewed, edited, and verified by the project authors.  
+All source code, system design, and implementation were fully developed by the authors. 
+
 
